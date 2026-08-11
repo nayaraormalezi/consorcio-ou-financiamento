@@ -7,6 +7,7 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
     const input = createDefaultInput()
     input.consortiumAnnualAdjustmentPct = 0
     input.consortiumHasBid = true
+    input.contemplationMonth = 1
     input.financingTermMonths = 120
     const result = simulate(input)
     const expectedInterest = ((0.01 * 240_000) / 2) * 121
@@ -34,6 +35,7 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
     const input = createDefaultInput()
     input.consortiumHasBid = false
     input.consortiumBid = 60_000
+    input.contemplationMonth = 1
     input.consortiumAnnualAdjustmentPct = 0
     input.consortiumHasInsurance = false
     input.consortiumHasMembershipFee = false
@@ -48,6 +50,7 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
   it('separa custo além do crédito e detecta quando total e VP discordam', () => {
     const input = createDefaultInput()
     input.financingTermMonths = 120
+    input.contemplationMonth = 1
     const result = simulate(input)
     expect(result.consortiumCostBeyondCredit).toBeGreaterThan(result.consortium.adminFee)
     expect(result.financingCostBeyondCredit).toBeCloseTo(result.financing.totalInterest, 2)
@@ -58,7 +61,9 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
   })
 
   it('usa prazo de financiamento independente, no padrão de 360 meses', () => {
-    const result = simulate(createDefaultInput())
+    const input = createDefaultInput()
+    input.contemplationMonth = 1
+    const result = simulate(input)
     expect(result.errors).toHaveLength(0)
     expect(result.consortium.termMonths).toBe(120)
     expect(result.financing.termMonths).toBe(360)
@@ -66,5 +71,12 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
     const expectedInterest = ((0.01 * 240_000) / 2) * (360 + 1)
     expect(result.financing.totalInterest).toBeCloseTo(expectedInterest, 2)
     expect(result.cheaperNominal).toBe('consortium')
+  })
+
+  it('não calcula o cenário sem mês de contemplação informado', () => {
+    const input = createDefaultInput()
+    expect(input.contemplationMonth).toBe(0)
+    const result = simulate(input)
+    expect(result.errors.some((error) => error.includes('mês da contemplação'))).toBe(true)
   })
 })

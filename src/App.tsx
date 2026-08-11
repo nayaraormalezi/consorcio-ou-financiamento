@@ -279,7 +279,11 @@ function errorsForStep(current: number, input: SimulatorInput): string[] {
     if (input.consortiumHasBid && input.consortiumBid < 0) {
       errors.push('O lance não pode ser negativo.')
     }
-    if (input.contemplationMonth < 1 || input.contemplationMonth > input.termMonths) {
+    if (!input.contemplationMonth || input.contemplationMonth < 1) {
+      errors.push(
+        'Informe o mês da contemplação. É uma hipótese de cálculo, não uma previsão.',
+      )
+    } else if (input.contemplationMonth > input.termMonths) {
       errors.push('O mês de contemplação deve estar dentro do prazo.')
     }
     return errors

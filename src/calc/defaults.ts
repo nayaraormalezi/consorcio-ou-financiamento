@@ -35,7 +35,7 @@ export function createDefaultInput(): SimulatorInput {
     consortiumMembershipFee: 0,
     consortiumHasOtherMonthly: false,
     consortiumOtherMonthly: 0,
-    contemplationMonth: 1,
+    contemplationMonth: 0,
 
     downPayment: 60_000,
     downPaymentPct: 20,

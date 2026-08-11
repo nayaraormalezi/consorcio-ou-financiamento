@@ -18,7 +18,7 @@ export function ResultsPanel({
         <SectionTitle
           step="Etapa 4"
           title="Veja o resultado"
-          subtitle="Há duas contas diferentes. Elas podem até apontar para lados opostos — e as duas estão certas, cada uma para a pergunta que faz."
+          subtitle="Cada métrica responde uma pergunta. Nenhuma delas, sozinha, diz qual produto é “melhor”."
         />
 
         <div className="mb-5 grid gap-4 lg:grid-cols-2">
@@ -34,9 +34,10 @@ export function ResultsPanel({
             <p className="text-xs font-semibold tracking-wide text-muted uppercase">2. Valor presente dos desembolsos</p>
             <p className="mt-2 text-sm font-medium text-ink">O mesmo dinheiro, convertido para hoje.</p>
             <p className="mt-2 text-sm leading-relaxed text-muted">
-              Pagar depois “pesa menos” do que pagar agora, porque o real de hoje poderia render.
-              Usamos {formatPct(input.discountAnnualPct)} a.a. como estimativa desse rendimento.
-              Isso não muda o que você paga — só o peso de cada pagamento no tempo.
+              Pagar depois pesa menos do que pagar agora, à taxa de desconto de{' '}
+              {formatPct(input.discountAnnualPct)} a.a. Este cálculo considera apenas os
+              pagamentos. Não atribui valor financeiro ao período em que o crédito ou o bem
+              está disponível.
             </p>
           </div>
         </div>
@@ -56,11 +57,11 @@ export function ResultsPanel({
             note="Pergunta: no fim das contas, quanto saiu da minha conta? Não desconta o tempo."
           />
           <MetricCard
-            eyebrow="Valor presente dos desembolsos"
+            eyebrow="Valor presente dos pagamentos"
             winner={result.cheaperNpv}
             left={cons.npv}
             right={fin.npv}
-            note={`Pergunta: quanto isso representa em dinheiro de hoje? Taxa de desconto: ${formatPct(input.discountAnnualPct)} a.a.`}
+            note={`Só os pagamentos, em dinheiro de hoje. Não mede o valor de usar o bem. Taxa: ${formatPct(input.discountAnnualPct)} a.a.`}
           />
         </div>
 
@@ -68,56 +69,85 @@ export function ResultsPanel({
           {reading(result)}
         </p>
 
+        {input.termMonths !== fin.termMonths ? (
+          <p className="mt-4 rounded-xl bg-attention-soft px-4 py-3 text-sm leading-relaxed text-attention">
+            Os prazos são diferentes: consórcio {formatCompactMonths(cons.paidMonths)} e
+            financiamento {formatCompactMonths(fin.termMonths)}. O total pago não deve ser
+            interpretado isoladamente.
+          </p>
+        ) : null}
+
         <div className="mt-5 grid gap-4 lg:grid-cols-2">
           <div className="rounded-2xl border border-line p-4">
             <p className="text-xs font-semibold tracking-wide text-muted uppercase">
-              Custo além do crédito original
-            </p>
-            <p className="mt-2 text-xs leading-relaxed text-muted">
-              O que você paga a mais do que os {formatBRL(cons.creditValue)} do bem. Entrada e
-              lance não entram aqui: são parte do próprio crédito.
+              Crédito e tempo
             </p>
             <dl className="mt-4 space-y-2 text-sm">
-              <Line
-                label="Consórcio (taxa + fundo + INPC + extras)"
-                value={result.consortiumCostBeyondCredit}
-                accent="cons"
-              />
-              <Line
-                label="Financiamento (juros + seguros + tarifas)"
-                value={result.financingCostBeyondCredit}
-                accent="fin"
-              />
+              <div className="flex items-baseline justify-between gap-3">
+                <dt className="text-cons">Consórcio · crédito estimado na contemplação</dt>
+                <dd className="font-medium">{formatBRL(cons.creditAtContemplation)}</dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-3">
+                <dt className="text-cons">Consórcio · utilizável nesta premissa</dt>
+                <dd className="font-medium">{formatBRL(cons.availableCredit)}</dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-3">
+                <dt className="text-cons">Tempo até o crédito</dt>
+                <dd className="font-medium">mês {cons.creditAvailableMonth}</dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-3">
+                <dt className="text-fin">Financiamento · crédito</dt>
+                <dd className="font-medium">{formatBRL(fin.creditValue)}</dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-3">
+                <dt className="text-fin">Tempo até o crédito</dt>
+                <dd className="font-medium">mês 0 · imediato</dd>
+              </div>
             </dl>
-            <p className="mt-3 text-xs text-muted">
-              Neste recorte, {winnerPhrase(result.cheaperCostBeyond)} tem menor custo além do bem.
+            <p className="mt-3 text-xs leading-relaxed text-muted">
+              A carta na contemplação é premissa deste modelo linear (crédito vigente no mês
+              informado). O simulador não prevê sorteio.
             </p>
           </div>
 
           <div className="rounded-2xl border border-cons/20 bg-cons-soft/50 p-4">
             <p className="text-xs font-semibold tracking-wide text-cons uppercase">
-              INPC também aumenta a carta
+              Impacto acumulado do reajuste (INPC estimado)
             </p>
-            {result.creditPurchasingPowerGain > 0 ? (
-              <>
-                <p className="mt-2 text-sm leading-relaxed">
-                  A carta começa em {formatBRL(cons.creditValue)} e, com o INPC estimado, chega a{' '}
-                  {formatBRL(cons.finalCreditValue)} no fim do plano (
-                  {formatBRL(result.creditPurchasingPowerGain)} a mais de poder de compra).
-                </p>
-                <p className="mt-2 text-xs leading-relaxed text-muted">
-                  Os {formatBRL(cons.totalReajustmentExtra)} de INPC no total pago não são juros:
-                  parte corrige o crédito. O financiamento entrega o bem de{' '}
-                  {formatBRL(fin.creditValue)} no início, sem essa correção.
-                </p>
-              </>
-            ) : (
-              <p className="mt-2 text-sm leading-relaxed">
-                INPC em 0%: a carta permanece em {formatBRL(cons.creditValue)}. Sem correção, a
-                comparação de totais fica mais próxima de “mesmo bem, mesmo poder de compra”.
-              </p>
-            )}
+            <dl className="mt-4 space-y-2 text-sm">
+              <Line label="Carta inicial" value={cons.creditValue} accent="cons" />
+              <Line label="Carta após reajustes" value={cons.finalCreditValue} accent="cons" />
+              <Line label="Total de pagamentos (parcelas)" value={cons.totalInstallments} accent="cons" />
+              <Line
+                label="Impacto acumulado do reajuste nos pagamentos"
+                value={cons.totalReajustmentExtra}
+                accent="cons"
+              />
+            </dl>
+            <p className="mt-3 text-xs leading-relaxed text-muted">
+              O índice é uma estimativa, não uma previsão do IBGE. O pagamento sobe e a carta
+              também. Isso não é juro de financiamento.
+            </p>
           </div>
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-line p-4">
+          <p className="text-xs font-semibold tracking-wide text-muted uppercase">Encargos</p>
+          <p className="mt-2 text-xs leading-relaxed text-muted">
+            Taxa, fundo, juros, seguros e tarifas — sem misturar reajuste da carta.
+          </p>
+          <dl className="mt-4 grid gap-2 sm:grid-cols-2 text-sm">
+            <Line
+              label="Consórcio (TA + fundo + extras)"
+              value={result.consortiumCostBeyondCredit}
+              accent="cons"
+            />
+            <Line
+              label="Financiamento (juros + seguros + tarifas)"
+              value={result.financingCostBeyondCredit}
+              accent="fin"
+            />
+          </dl>
         </div>
 
         <div className="mt-5 overflow-x-auto">
@@ -132,7 +162,22 @@ export function ResultsPanel({
             <tbody className="[&_td]:py-2.5 [&_td]:align-top">
               <Row label="Crédito original" a={formatBRL(cons.creditValue)} b={formatBRL(fin.creditValue)} />
               <Row
-                label="Crédito ao fim do plano"
+                label="Crédito estimado na contemplação"
+                a={formatBRL(cons.creditAtContemplation)}
+                b={formatBRL(fin.creditValue)}
+              />
+              <Row
+                label="Crédito utilizável"
+                a={formatBRL(cons.availableCredit)}
+                b={formatBRL(fin.financedAmount + fin.downPayment)}
+              />
+              <Row
+                label="Tempo até o crédito"
+                a={`mês ${cons.creditAvailableMonth}`}
+                b="mês 0 · imediato"
+              />
+              <Row
+                label="Carta após reajustes"
                 a={formatBRL(cons.finalCreditValue)}
                 b={formatBRL(fin.creditValue)}
               />
@@ -156,7 +201,7 @@ export function ResultsPanel({
               <Row label="Taxa de administração" a={formatBRL(cons.adminFee)} b="—" />
               <Row label="Fundo de reserva" a={formatBRL(cons.reserveFund)} b="—" />
               <Row
-                label="INPC no total pago"
+                label="Impacto acumulado do reajuste"
                 a={formatBRL(cons.totalReajustmentExtra)}
                 b="—"
               />
@@ -171,7 +216,7 @@ export function ResultsPanel({
                 b={formatBRL(fin.totalUpfrontFees + fin.totalMonthlyExtras)}
               />
               <Row
-                label="Custo além do crédito original"
+                label="Encargos (sem reajuste da carta)"
                 a={formatBRL(result.consortiumCostBeyondCredit)}
                 b={formatBRL(result.financingCostBeyondCredit)}
                 strong
@@ -183,7 +228,7 @@ export function ResultsPanel({
                 strong
               />
               <Row
-                label="Valor presente (equivalente em dinheiro de hoje)"
+                label="Valor presente dos pagamentos"
                 a={formatBRL(cons.npv)}
                 b={formatBRL(fin.npv)}
                 strong
@@ -192,9 +237,8 @@ export function ResultsPanel({
           </table>
         </div>
         <p className="mt-3 text-xs text-muted">
-          *No consórcio não há juros de financiamento. O custo além do bem aparece como taxa de
-          administração, fundo de reserva, seguros e correção pelo INPC — esta última também
-          reajusta o valor da carta.
+          *No consórcio não há juros de financiamento. Encargos são taxa, fundo, seguro e adesão.
+          O reajuste estimado sobe pagamento e carta juntos — não é juro.
         </p>
       </Card>
 
@@ -205,23 +249,31 @@ export function ResultsPanel({
             <Item label="Crédito original" value={cons.creditValue} />
             <Item label="Taxa de administração" value={cons.adminFee} />
             <Item label="Fundo de reserva" value={cons.reserveFund} />
-            <Item label="Lance (desembolso separado)" value={cons.bid} />
+            <Item
+              label={
+                cons.bidKind === 'embedded'
+                  ? 'Lance embutido (não sai do caixa)'
+                  : 'Lance próprio (sai do caixa)'
+              }
+              value={cons.bid}
+            />
+            <Item label="Crédito estimado na contemplação" value={cons.creditAtContemplation} />
+            <Item label="Crédito utilizável nesta premissa" value={cons.availableCredit} />
             <Item label="Parcelas (sem o lance)" value={cons.totalInstallments} />
             <Item label="Seguro" value={cons.totalInsurance} />
             <Item label="Adesão e outros" value={cons.membershipFee + cons.totalOtherMonthly} />
             <Item
-              label={`INPC no aniversário (${cons.inpcApplications}x)`}
+              label={`Impacto do reajuste (${cons.inpcApplications}x)`}
               value={cons.totalReajustmentExtra}
             />
-            <Item label="Carta ao fim do plano" value={cons.finalCreditValue} />
-            <Item label="Custo além do crédito" value={result.consortiumCostBeyondCredit} />
+            <Item label="Carta após reajustes" value={cons.finalCreditValue} />
+            <Item label="Encargos (TA + fundo + extras)" value={result.consortiumCostBeyondCredit} />
             <Item label="Total desembolsado" value={cons.totalDisbursed} strong />
           </ul>
           {input.consortiumBidKind === 'embedded' && input.consortiumHasBid ? (
             <p className="mt-4 text-xs text-muted">
-              Lance embutido: crédito disponível estimado {formatBRL(cons.availableCredit)}.
-              Para comprar o mesmo bem de {formatBRL(cons.creditValue)}, o complemento
-              aparece como lance no fluxo.
+              Lance embutido (premissa do modelo): a carta vigente na contemplação menos o
+              lance. Utilizável {formatBRL(cons.availableCredit)}. O lance não entra no caixa.
             </p>
           ) : null}
         </Card>
@@ -235,12 +287,12 @@ export function ResultsPanel({
             <Item label="Tarifas e custos iniciais" value={fin.totalUpfrontFees} />
             <Item label="Outros custos mensais" value={fin.totalMonthlyExtras} />
             <Item label="Residual / balloon" value={fin.residual} />
-            <Item label="Custo além do crédito" value={result.financingCostBeyondCredit} />
+            <Item label="Encargos (juros + seguros + tarifas)" value={result.financingCostBeyondCredit} />
             <Item label="Total desembolsado" value={fin.totalDisbursed} strong />
           </ul>
           <p className="mt-4 text-xs text-muted">
             Sistema {fin.system.toUpperCase()} · taxa{' '}
-            {fin.rateSource === 'cet' ? 'CET' : 'de juros'} de{' '}
+            {fin.rateSource === 'cet' ? 'CET informado' : 'de juros'} de{' '}
             {formatPct(fin.monthlyRate * 100, 4)} a.m. efetiva (
             {formatPct(fin.annualEffectiveRate * 100, 2)} a.a. efetiva) ·{' '}
             {formatCompactMonths(fin.termMonths)}.
@@ -252,13 +304,20 @@ export function ResultsPanel({
 }
 
 function reading(result: ComparisonResult): string {
+  const consWait = result.consortium.creditAvailableMonth
+  const waitLine =
+    consWait > 0
+      ? ` Neste cenário, o financiamento disponibiliza o crédito no mês 0; o consórcio, no mês ${consWait}.`
+      : ' Neste cenário, as duas hipóteses disponibilizam o crédito no início.'
+  const depend = ' Os resultados dependem da hipótese de contemplação e do índice estimado.'
+
   if (result.metricsDisagree) {
-    return `As lentes discordam. No total nominal, ${winnerPhrase(result.cheaperNominal)} desembolsaria menos (${formatBRL(Math.abs(result.nominalDiff))}). No valor presente, ${winnerPhrase(result.cheaperNpv)} fica menor (${formatBRL(Math.abs(result.npvDiff))}). Isso é comum quando o INPC empurra parcelas do consórcio para o futuro e o financiamento é prefixado. Olhe também o custo além do bem e o poder de compra da carta.`
+    return `Neste cenário, ${winnerPhrase(result.cheaperNominal)} apresenta menor desembolso nominal (${formatBRL(Math.abs(result.nominalDiff))}). No valor presente dos pagamentos, ${winnerPhrase(result.cheaperNpv)} fica menor (${formatBRL(Math.abs(result.npvDiff))}). Isso não declara uma opção melhor: o VP não atribui valor ao uso do bem.${waitLine}${depend}`
   }
   if (result.cheaperNominal === 'tie' && result.cheaperNpv === 'tie') {
-    return 'Neste cenário, total pago e valor presente ficam praticamente iguais. A decisão tende a girar em torno de quando você precisa do bem, não do custo.'
+    return `Neste cenário, total pago e valor presente dos pagamentos ficam praticamente iguais.${waitLine}${depend}`
   }
-  return `Nas duas lentes — total pago e valor presente — ${winnerPhrase(result.cheaperNominal)} desembolsaria menos neste cenário. Ainda assim, isso não é uma recomendação: tempo até ter o bem e o reajuste da carta pelo INPC também pesam.`
+  return `Neste cenário, ${winnerPhrase(result.cheaperNominal)} apresenta menor desembolso nominal e também menor valor presente dos pagamentos. Isso mede pagamentos, não qual produto é melhor.${waitLine}${depend}`
 }
 
 function winnerPhrase(option: CheaperOption): string {
@@ -283,7 +342,9 @@ function MetricCard({
     <div className="rounded-2xl border border-line bg-card p-4 sm:p-5">
       <p className="text-xs font-semibold tracking-wide text-muted uppercase">{eyebrow}</p>
       <p className="mt-1 text-sm font-medium text-ink">
-        {winner === 'tie' ? 'Quase empate' : `Menor neste recorte: ${winner === 'consortium' ? 'consórcio' : 'financiamento'}`}
+        {winner === 'tie'
+          ? 'Quase empate nesta métrica'
+          : `Menor ${eyebrow.toLowerCase()}: ${winner === 'consortium' ? 'consórcio' : 'financiamento'}`}
       </p>
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
         <div>

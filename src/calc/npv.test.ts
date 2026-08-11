@@ -16,7 +16,9 @@ describe('valor presente', () => {
   })
 
   it('o VP é menor que o total nominal quando há desembolso ao longo do tempo', () => {
-    const result = simulate(createDefaultInput())
+    const input = createDefaultInput()
+    input.contemplationMonth = 1
+    const result = simulate(input)
     expect(result.consortium.npv).toBeLessThan(result.consortium.totalDisbursed)
     expect(result.financing.npv).toBeLessThan(result.financing.totalDisbursed)
   })

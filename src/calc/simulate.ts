@@ -16,7 +16,11 @@ export function validateInput(input: SimulatorInput): string[] {
     errors.push('A entrada não pode ser maior que o valor do crédito.')
   }
   if (input.consortiumBid < 0) errors.push('O lance não pode ser negativo.')
-  if (input.contemplationMonth < 1 || input.contemplationMonth > input.termMonths) {
+  if (!input.contemplationMonth || input.contemplationMonth < 1) {
+    errors.push(
+      'Informe o mês da contemplação. É uma hipótese de cálculo, não uma previsão.',
+    )
+  } else if (input.contemplationMonth > input.termMonths) {
     errors.push('O mês de contemplação deve estar dentro do prazo.')
   }
   if (input.rateMonthlyPct < 0 || input.rateAnnualPct < 0) {
@@ -79,7 +83,6 @@ export function simulate(input: SimulatorInput): ComparisonResult {
   const consortiumCostBeyondCredit =
     consortium.adminFee +
     consortium.reserveFund +
-    consortium.totalReajustmentExtra +
     consortium.totalInsurance +
     consortium.membershipFee +
     consortium.totalOtherMonthly
@@ -160,10 +163,14 @@ export function syncDerivedFields(input: SimulatorInput): SimulatorInput {
     next.cetMonthlyPct = cet.monthly * 100
   }
 
-  next.contemplationMonth = Math.min(
-    Math.max(1, Math.round(next.contemplationMonth || 1)),
-    Math.max(1, next.termMonths),
-  )
+  if (next.contemplationMonth >= 1) {
+    next.contemplationMonth = Math.min(
+      Math.max(1, Math.round(next.contemplationMonth)),
+      Math.max(1, next.termMonths),
+    )
+  } else {
+    next.contemplationMonth = 0
+  }
   next.consortiumFirstAnniversaryMonth = Math.min(
     Math.max(1, Math.round(next.consortiumFirstAnniversaryMonth || 13)),
     Math.max(1, next.termMonths + 12),

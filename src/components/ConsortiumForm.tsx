@@ -125,15 +125,18 @@ export function ConsortiumForm({
 
       <div className="mt-6">
         <Field
-          label="Mês estimado de contemplação"
-          hint="Quando você acha que vai usar o crédito. Não é uma previsão de sorteio."
-          help="Contemplação é o momento em que você recebe o crédito, por sorteio ou lance. Até lá você já paga parcelas, em geral sem ter o bem. Esta data é a sua hipótese para o fluxo de caixa — o simulador não adivinha o sorteio."
+          label="Quando você pretende ser contemplado?"
+          hint="Campo obrigatório. Use uma hipótese para simular. O simulador não prevê quando a contemplação ocorrerá."
+          help="Informe o mês em que o crédito entra no fluxo desta simulação. Não é previsão de sorteio nem média de grupo. Sem este mês o simulador não calcula, para não assumir contemplação no mês 1."
         >
           <IntegerInput
             value={input.contemplationMonth}
             onChange={(contemplationMonth) => onChange({ contemplationMonth })}
             min={1}
             max={input.termMonths}
+            allowEmpty
+            required
+            placeholder="Mês da contemplação"
           />
         </Field>
       </div>
@@ -144,7 +147,7 @@ export function ConsortiumForm({
           onToggle={(consortiumHasBid) => onChange({ consortiumHasBid })}
           label="Vou oferecer lance"
           description="Deixe desligado se pretende esperar o sorteio."
-          help="Lance é um valor que você oferece para tentar ser contemplado antes. Ele sai do bolso na contemplação e reduz o que ainda falta pagar — ou o prazo, conforme a regra que você escolher. Não é um desconto extra: é parte do que você já pagaria, antecipada."
+          help="Lance próprio: sai do bolso na contemplação e reduz o saldo — não é desconto do custo total. Lance embutido: reduz a carta e o saldo, mas não entra como dinheiro novo no caixa."
         >
           <Field label="Valor do lance" hint={`Equivale a ${formatBRL(input.consortiumBid)}.`}>
             <div className="grid grid-cols-2 gap-2">

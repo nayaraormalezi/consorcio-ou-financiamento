@@ -1,0 +1,666 @@
+{
+  "version": "v2",
+  "tests": 16,
+  "checks": 70,
+  "successes": 70,
+  "failures": 0,
+  "results": [
+    {
+      "test": "TESTE 1 — R$ 100.000 / 100 meses / sem lance / SAC 1% a.m. / sem INPC",
+      "notes": "",
+      "checks": [
+        {
+          "name": "cons.admin",
+          "simulator": 20000.0,
+          "independent": 20000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "cons.reserve",
+          "simulator": 2000.0,
+          "independent": 2000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "cons.parcela",
+          "simulator": 1220.0,
+          "independent": 1220.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "cons.total",
+          "simulator": 122000.0,
+          "independent": 122000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.juros_fechado",
+          "simulator": 50500.0,
+          "independent": 50500.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.total",
+          "simulator": 150500.0,
+          "independent": 150500.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.parcela1",
+          "simulator": 2000.0,
+          "independent": 2000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.saldo_final",
+          "simulator": 0.0,
+          "independent": 0.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "TESTE 2 — R$ 500.000 / 180 meses / sem lance",
+      "notes": "",
+      "checks": [
+        {
+          "name": "cons.total",
+          "simulator": 610000.0,
+          "independent": 610000.0,
+          "diff": -0.0,
+          "diff_pct": -0.0,
+          "ok": true
+        },
+        {
+          "name": "cons.parcela",
+          "simulator": 3388.8889,
+          "independent": 3388.8889,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.juros",
+          "simulator": 452500.0,
+          "independent": 452500.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.total",
+          "simulator": 952500.0,
+          "independent": 952500.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "TESTE 3 — R$ 500.000 / lance próprio R$ 100.000 / contemplação mês 12",
+      "notes": "Lance próprio: total nominal deve permanecer = fundo (não é desconto). availableCredit = carta cheia.",
+      "checks": [
+        {
+          "name": "cons.total_nominal",
+          "simulator": 610000.0,
+          "independent": 610000.0,
+          "diff": -0.0,
+          "diff_pct": -0.0,
+          "ok": true
+        },
+        {
+          "name": "cons.replica",
+          "simulator": 610000.0,
+          "independent": 610000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "cons.available",
+          "simulator": 500000.0,
+          "independent": 500000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "parcela_mes1",
+          "simulator": 3388.8889,
+          "independent": 3388.8889,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "parcela_apos_lance",
+          "simulator": 2797.1729,
+          "independent": 2797.1729,
+          "diff": -0.0,
+          "diff_pct": -0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "TESTE 4 — lance embutido R$ 100.000",
+      "notes": "V2: lance embutido não entra no caixa. Fundo 610.000 − 100.000 = 510.000.",
+      "checks": [
+        {
+          "name": "availableCredit",
+          "simulator": 400000.0,
+          "independent": 400000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "creditAtContemplation",
+          "simulator": 500000.0,
+          "independent": 500000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "total_caixa",
+          "simulator": 510000.0,
+          "independent": 510000.0,
+          "diff": -0.0,
+          "diff_pct": -0.0,
+          "ok": true
+        },
+        {
+          "name": "total_vs_replica",
+          "simulator": 510000.0,
+          "independent": 510000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "bid_no_resultado",
+          "simulator": 100000.0,
+          "independent": 100000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "TESTE 5 — Price R$ 100.000 / 100 meses / 1% a.m.",
+      "notes": "",
+      "checks": [
+        {
+          "name": "pmt_formula",
+          "simulator": 1586.5743,
+          "independent": 1586.5743,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "juros",
+          "simulator": 58657.4313,
+          "independent": 58657.4313,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "total",
+          "simulator": 158657.4313,
+          "independent": 158657.4313,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "saldo_final",
+          "simulator": 0.0,
+          "independent": 0.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "parcela_constante_m50",
+          "simulator": 1586.5743,
+          "independent": 1586.5743,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "TESTE 6 — SAC R$ 100.000 / 100 meses / 1% a.m.",
+      "notes": "",
+      "checks": [
+        {
+          "name": "amort_const",
+          "simulator": 1000.0,
+          "independent": 1000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "juros1",
+          "simulator": 1000.0,
+          "independent": 1000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "parcela1",
+          "simulator": 2000.0,
+          "independent": 2000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "juros_total_fechado",
+          "simulator": 50500.0,
+          "independent": 50500.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "saldo_final",
+          "simulator": 0.0,
+          "independent": 0.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "TESTE 7 — juros 0%",
+      "notes": "",
+      "checks": [
+        {
+          "name": "juros",
+          "simulator": 0.0,
+          "independent": 0.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "parcela",
+          "simulator": 1000.0,
+          "independent": 1000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "total_fin",
+          "simulator": 100000.0,
+          "independent": 100000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "cons.total",
+          "simulator": 122000.0,
+          "independent": 122000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "TESTE 8 — taxa de administração 0% e fundo 0%",
+      "notes": "",
+      "checks": [
+        {
+          "name": "admin",
+          "simulator": 0.0,
+          "independent": 0.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "reserve",
+          "simulator": 0.0,
+          "independent": 0.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "cons.total",
+          "simulator": 100000.0,
+          "independent": 100000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "parcela",
+          "simulator": 1000.0,
+          "independent": 1000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "TESTE 9 — prazo 1 mês",
+      "notes": "",
+      "checks": [
+        {
+          "name": "cons.total",
+          "simulator": 122000.0,
+          "independent": 122000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "cons.parcela",
+          "simulator": 122000.0,
+          "independent": 122000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.parcela",
+          "simulator": 101000.0,
+          "independent": 101000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.juros",
+          "simulator": 1000.0,
+          "independent": 1000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.saldo",
+          "simulator": 0.0,
+          "independent": 0.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "TESTE 10 — crédito R$ 0",
+      "notes": "validateInput registra erro, mas o motor ainda calcula.",
+      "checks": [
+        {
+          "name": "cons.total",
+          "simulator": 0.0,
+          "independent": 0.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.total",
+          "simulator": 0.0,
+          "independent": 0.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.juros",
+          "simulator": 0.0,
+          "independent": 0.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "EXTRA — lance embutido + INPC (contemplação mês 24)",
+      "notes": "Premissa do modelo: utilizável = carta vigente no mês da contemplação − lance embutido.",
+      "checks": [
+        {
+          "name": "carta_na_contemplacao",
+          "simulator": 522500.0,
+          "independent": 522500.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "utilizavel",
+          "simulator": 422500.0,
+          "independent": 422500.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "total_caixa",
+          "simulator": 707520.5566,
+          "independent": 707520.5566,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "EXTRA — INPC 4,5% aniversário, R$ 300 mil / 120 meses",
+      "notes": "",
+      "checks": [
+        {
+          "name": "total_vs_replica_spec",
+          "simulator": 449748.463,
+          "independent": 449748.463,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "carta_final_vs_replica",
+          "simulator": 445828.5421,
+          "independent": 445828.5421,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "inpc_vezes",
+          "simulator": 9.0,
+          "independent": 9.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "total_vs_sem_inpc",
+          "simulator": 449748.463,
+          "independent": 366000.0,
+          "diff": 83748.463,
+          "diff_pct": 22.882094,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "EXTRA — defaults do app (carta 300k, consórcio 120m, fin 360m, entrada 20%, INPC 4,5%)",
+      "notes": "",
+      "checks": [
+        {
+          "name": "fin.principal",
+          "simulator": 240000.0,
+          "independent": 240000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.prazo",
+          "simulator": 360.0,
+          "independent": 360.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.juros",
+          "simulator": 433200.0,
+          "independent": 433200.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "fin.total",
+          "simulator": 733200.0,
+          "independent": 733200.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "cons.prazo",
+          "simulator": 120.0,
+          "independent": 120.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "EXTRA — Price com residual R$ 20.000 em R$ 120.000 / 24 meses",
+      "notes": "V2: PMT = (P − R/(1+i)^n) × fator Price. Saldo final permanece o residual e o balloon não entra no caixa.",
+      "checks": [
+        {
+          "name": "pmt_teorico",
+          "simulator": 4907.3472,
+          "independent": 4907.3472,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "pmt_vs_4907",
+          "simulator": 4907.3472,
+          "independent": 4907.35,
+          "diff": -0.0028,
+          "diff_pct": -5.7e-05,
+          "ok": true
+        },
+        {
+          "name": "financed",
+          "simulator": 120000.0,
+          "independent": 120000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "residual",
+          "simulator": 20000.0,
+          "independent": 20000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "saldo_final",
+          "simulator": 20000.0,
+          "independent": 20000.0,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "total_caixa_sem_balloon",
+          "simulator": 117776.3333,
+          "independent": 117776.3333,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "EXTRA — CET 12% a.a. efetivo usado como taxa (não calcula CET)",
+      "notes": "",
+      "checks": [
+        {
+          "name": "i_m",
+          "simulator": 0.0095,
+          "independent": 0.0095,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "juros",
+          "simulator": 57407.1973,
+          "independent": 57407.1973,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        },
+        {
+          "name": "parcela1",
+          "simulator": 1782.2126,
+          "independent": 1782.2126,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "test": "NPV — financiamento TESTE 1 vs fórmula VP = Σ CF/(1+i)^t",
+      "notes": "",
+      "checks": [
+        {
+          "name": "npv_fin",
+          "simulator": 107943.6859,
+          "independent": 107943.6859,
+          "diff": 0.0,
+          "diff_pct": 0.0,
+          "ok": true
+        }
+      ]
+    }
+  ],
+  "failed": []
+}

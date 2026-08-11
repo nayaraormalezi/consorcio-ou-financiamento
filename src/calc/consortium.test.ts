@@ -102,4 +102,29 @@ describe('consórcio simplificado', () => {
     expect(result.schedule[24].creditValue).toBeCloseTo(363_000, 2)
     expect(result.inpcApplications).toBe(2)
   })
+
+  it('lance embutido não entra no caixa e reduz a carta vigente', () => {
+    const input = createDefaultInput()
+    input.creditValue = 500_000
+    input.termMonths = 180
+    input.consortiumAdminFeePct = 20
+    input.consortiumReservePct = 2
+    input.consortiumHasBid = true
+    input.consortiumBid = 100_000
+    input.consortiumBidKind = 'embedded'
+    input.consortiumBidMode = 'reduce_installment'
+    input.consortiumAnnualAdjustmentPct = 0
+    input.contemplationMonth = 12
+    input.consortiumInsuranceMode = 'none'
+
+    const result = simulateConsortium(input)
+    expect(result.creditAtContemplation).toBeCloseTo(500_000, 2)
+    expect(result.availableCredit).toBeCloseTo(400_000, 2)
+    expect(result.totalDisbursed).toBeCloseTo(510_000, 2)
+    expect(result.schedule.find((row) => row.month === 12)?.bid).toBeCloseTo(100_000, 2)
+    expect(result.schedule.find((row) => row.month === 12)?.total).toBeCloseTo(
+      result.schedule.find((row) => row.month === 12)!.installment,
+      2,
+    )
+  })
 })

@@ -19,9 +19,9 @@ export function CostVsTime({
   const wait = input.contemplationMonth
   const mismatch =
     input.creditTiming === 'immediate' && wait > 1
-      ? 'Há um descompasso: você quer o bem agora, mas a contemplação do consórcio está estimada para depois do primeiro mês. O financiamento, se aprovado, costuma entregar o bem no início.'
+      ? 'Há um descompasso: você quer o bem agora, mas a contemplação simulada (hipótese, não previsão) está depois do primeiro mês. O financiamento, se aprovado, costuma entregar o bem no início.'
       : input.creditTiming === 'flexible' && wait === 1
-        ? 'Você pode esperar, mas a simulação assume contemplação no 1º mês — um cenário otimista para o consórcio.'
+        ? 'Você pode esperar, mas a simulação usa contemplação no 1º mês — hipótese otimista para o consórcio, não uma previsão.'
         : null
 
   return (
@@ -45,8 +45,11 @@ export function CostVsTime({
               : '.'}
           </p>
           <p className="mt-3 text-sm font-medium">
-            Desembolso total {formatBRL(result.financing.totalDisbursed)} · VP{' '}
-            {formatBRL(result.financing.npv)}
+            Crédito disponível: mês 0 (imediato)
+          </p>
+          <p className="mt-1 text-sm font-medium">
+            Desembolso total {formatBRL(result.financing.totalDisbursed)} · valor presente
+            dos pagamentos {formatBRL(result.financing.npv)}
           </p>
         </div>
         <div className="rounded-2xl border border-cons/20 bg-cons-soft/60 p-4">
@@ -57,8 +60,12 @@ export function CostVsTime({
             Não há garantia de contemplação nessa data.
           </p>
           <p className="mt-3 text-sm font-medium">
-            Desembolso total {formatBRL(result.consortium.totalDisbursed)} · VP{' '}
-            {formatBRL(result.consortium.npv)}
+            Crédito disponível: mês {result.consortium.creditAvailableMonth} · tempo até o
+            crédito: {formatCompactMonths(result.consortium.creditAvailableMonth)}
+          </p>
+          <p className="mt-1 text-sm font-medium">
+            Desembolso total {formatBRL(result.consortium.totalDisbursed)} · valor presente
+            dos pagamentos {formatBRL(result.consortium.npv)}
           </p>
         </div>
       </div>

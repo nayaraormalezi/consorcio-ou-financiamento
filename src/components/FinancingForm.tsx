@@ -176,12 +176,12 @@ export function FinancingForm({
         <OptionalBlock
           enabled={input.useCet}
           onToggle={(useCet) => onChange({ useCet })}
-          label="Quero usar o CET"
-          description="Use se o banco informou o Custo Efetivo Total."
-          help="O CET junta juros, tarifas e parte dos seguros numa taxa só. Se você preencher o CET, o simulador usa essa taxa e pode deixar de somar de novo os custos que já estão dentro dele."
+          label="Quero usar o CET informado"
+          description="Use o CET da proposta do banco. O simulador não calcula o CET a partir dos fluxos."
+          help="O CET informado substitui a taxa de juros nesta simulação. Não é um CET calculado aqui. Se a proposta já inclui seguros e tarifas, marque a caixa abaixo para não somá-los de novo."
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="CET mensal">
+            <Field label="CET informado (mensal)">
               <PercentInput
                 value={input.cetMonthlyPct}
                 onChange={(cetMonthlyPct) =>
@@ -189,7 +189,7 @@ export function FinancingForm({
                 }
               />
             </Field>
-            <Field label="CET anual">
+            <Field label="CET informado (anual)">
               <PercentInput
                 value={input.cetAnnualPct}
                 onChange={(cetAnnualPct) =>

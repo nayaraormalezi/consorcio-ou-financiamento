@@ -65,21 +65,35 @@ export function IntegerInput({
   onChange,
   min = 0,
   max = 9999,
+  allowEmpty = false,
+  placeholder,
+  required = false,
 }: {
   value: number
   onChange: (value: number) => void
   min?: number
   max?: number
+  allowEmpty?: boolean
+  placeholder?: string
+  required?: boolean
 }) {
+  const empty = allowEmpty && value < min
   return (
     <input
       inputMode="numeric"
       autoComplete="off"
       className={inputClass}
-      value={String(value)}
+      value={empty ? '' : String(value)}
+      placeholder={placeholder}
+      required={required}
+      aria-required={required || undefined}
       onChange={(event) => {
         const digits = event.target.value.replace(/\D/g, '')
-        const next = digits ? Number(digits) : 0
+        if (!digits && allowEmpty) {
+          onChange(0)
+          return
+        }
+        const next = digits ? Number(digits) : min
         onChange(Math.min(max, Math.max(min, next)))
       }}
     />

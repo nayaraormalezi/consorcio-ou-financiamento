@@ -1,5 +1,8 @@
 export type BidMode = 'reduce_installment' | 'reduce_term'
 export type BidKind = 'own' | 'embedded'
+
+/** Reservado: comparação a prazos de mercado vs mesmo prazo. Ainda não exposto na UI. */
+export type ComparisonHorizon = 'market_terms' | 'same_term'
 export type InsuranceMode = 'none' | 'monthly' | 'percent'
 export type AmortizationSystem = 'sac' | 'price'
 export type RateInputMode = 'monthly' | 'annual'
@@ -96,7 +99,15 @@ export interface ConsortiumResult {
   adminFee: number
   reserveFund: number
   bid: number
+  bidKind: BidKind
+  /** Carta vigente no mês da contemplação (premissa do modelo linear + INPC). */
+  creditAtContemplation: number
+  /**
+   * Crédito que o cotista pode usar na contemplação.
+   * Embutido: carta vigente − lance. Próprio: carta vigente.
+   */
   availableCredit: number
+  creditAvailableMonth: number
   termMonths: number
   paidMonths: number
   firstInstallment: number

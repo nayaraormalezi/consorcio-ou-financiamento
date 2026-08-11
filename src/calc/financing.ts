@@ -21,6 +21,23 @@ export function priceInstallment(
   return (principal * monthlyRate * factor) / (factor - 1)
 }
 
+/**
+ * Price com residual/balloon:
+ * PMT = (P − R/(1+i)^n) × [i(1+i)^n / ((1+i)^n − 1)]
+ */
+export function priceBalloonInstallment(
+  principal: number,
+  residual: number,
+  monthlyRate: number,
+  n: number,
+): number {
+  const balloon = Math.min(Math.max(0, residual), Math.max(0, principal))
+  if (n <= 0) return 0
+  if (Math.abs(monthlyRate) < 1e-12) return Math.max(0, principal - balloon) / n
+  const presentResidual = balloon / (1 + monthlyRate) ** n
+  return priceInstallment(Math.max(0, principal - presentResidual), monthlyRate, n)
+}
+
 export function simulateFinancing(
   input: SimulatorInput,
   monthlyRate: number,
@@ -44,8 +61,11 @@ export function simulateFinancing(
       Math.max(0, input.otherUpfront)
 
   const system = input.amortization
+  const hasBalloon = residual > EPS
   const sacAmort = n > 0 ? amortizable / n : 0
-  const pmt = priceInstallment(amortizable, monthlyRate, n)
+  const pmt = hasBalloon
+    ? priceBalloonInstallment(financedAmount, residual, monthlyRate, n)
+    : priceInstallment(amortizable, monthlyRate, n)
 
   const schedule: FinancingMonth[] = []
   let balance = financedAmount
@@ -66,26 +86,29 @@ export function simulateFinancing(
     if (system === 'sac') {
       amortization = isLast ? Math.max(0, opening - residual) : sacAmort
       installment = amortization + interest
-      if (isLast) {
-        residualPayment = residual
-        amortization += residual
-      }
-    } else {
-      installment = isLast ? opening * (1 + monthlyRate) - residual : pmt
+      if (isLast && hasBalloon) residualPayment = residual
+    } else if (hasBalloon) {
+      installment = pmt
       amortization = installment - interest
-      if (isLast) {
-        residualPayment = residual
-        amortization += residual
-      }
+      if (isLast) residualPayment = residual
+    } else {
+      installment = isLast ? opening * (1 + monthlyRate) : pmt
+      amortization = installment - interest
     }
 
     let closing = opening - amortization
-    if (Math.abs(closing) < EPS) closing = 0
-    if (closing < 0 && closing > -0.05) closing = 0
+    if (!hasBalloon) {
+      if (Math.abs(closing) < EPS) closing = 0
+      if (closing < 0 && closing > -0.05) closing = 0
+    } else if (Math.abs(closing - residual) < 0.05) {
+      closing = residual
+    } else if (closing < 0 && closing > -0.05) {
+      closing = 0
+    }
 
     const insurance = insuranceMonthly
     const other = otherMonthly
-    const total = installment + insurance + other + residualPayment
+    const total = installment + insurance + other
 
     schedule.push({
       month,
@@ -126,11 +149,7 @@ export function simulateFinancing(
     annualNominalRate: monthlyRate * 12,
     rateSource: extrasIncludedInCet ? 'cet' : 'interest',
     firstInstallment: firstPrincipalInstallment + insuranceMonthly + otherMonthly,
-    lastInstallment:
-      lastPrincipalInstallment +
-      insuranceMonthly +
-      otherMonthly +
-      (schedule.at(-1)?.residual ?? 0),
+    lastInstallment: lastPrincipalInstallment + insuranceMonthly + otherMonthly,
     totalInterest,
     totalAmortization,
     totalInsurance,

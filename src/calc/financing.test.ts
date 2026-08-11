@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createDefaultInput } from './defaults'
-import { priceInstallment, simulateFinancing } from './financing'
+import { priceBalloonInstallment, priceInstallment, simulateFinancing } from './financing'
 import { almostEqual } from './format'
 
 describe('SAC', () => {
@@ -71,6 +71,27 @@ describe('Price', () => {
 
   it('com taxa zero, Price coincide com P/n', () => {
     expect(priceInstallment(120_000, 0, 120)).toBeCloseTo(1_000, 10)
+  })
+
+  it('Price com residual preserva o balloon e o PMT teórico', () => {
+    const input = createDefaultInput()
+    input.creditValue = 120_000
+    input.downPayment = 0
+    input.financingTermMonths = 24
+    input.amortization = 'price'
+    input.financingHasResidual = true
+    input.residualValue = 20_000
+    const i = 0.01
+    const pmt = priceBalloonInstallment(120_000, 20_000, i, 24)
+    expect(pmt).toBeCloseTo(4_907.35, 2)
+
+    const result = simulateFinancing(input, i, false)
+    expect(result.firstInstallment).toBeCloseTo(pmt, 2)
+    expect(result.schedule.at(-1)?.closingBalance).toBeCloseTo(20_000, 2)
+    expect(result.schedule.at(-1)?.residual).toBeCloseTo(20_000, 2)
+    for (let k = 0; k < 23; k++) {
+      expect(result.schedule[k].installment).toBeCloseTo(pmt, 4)
+    }
   })
 })
 

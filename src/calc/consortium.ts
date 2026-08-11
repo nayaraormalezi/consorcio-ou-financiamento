@@ -9,7 +9,8 @@ const EPS = 0.005
  *
  * 1. Encargos totais = crédito × (taxa de administração + fundo de reserva)
  * 2. Saldo a diluir = crédito + encargos
- * 3. O lance reduz o saldo na contemplação (não entra de novo nas parcelas)
+ * 3. O lance reduz o saldo na contemplação (não entra de novo nas parcelas).
+ *    Lance próprio entra no caixa; lance embutido só reduz a carta e o saldo.
  * 4. Redução de parcela: parcela = saldo / meses restantes no prazo original
  * 5. Redução de prazo: parcela teórica inicial (reajustada) até zerar o saldo
  * 6. No aniversário do grupo, o INPC estimado corrige crédito e saldo remanescente.
@@ -86,7 +87,8 @@ export function simulateConsortium(input: SimulatorInput): ConsortiumResult {
 
     const insurance = insuranceForMonth(input, creditValue)
     const membership = month === 1 ? membershipFee : 0
-    const total = installment + insurance + otherMonthly + bidNow + membership
+    const bidCash = input.consortiumBidKind === 'embedded' ? 0 : bidNow
+    const total = installment + insurance + otherMonthly + bidCash + membership
 
     schedule.push({
       month,
@@ -121,15 +123,23 @@ export function simulateConsortium(input: SimulatorInput): ConsortiumResult {
     schedule.map((row) => ({ month: row.month, amount: row.total })),
   )
 
+  const contemplationRow =
+    schedule.find((row) => row.month === contemplation) ?? schedule[0]
+  const creditAtContemplation = contemplationRow?.creditValue ?? credit0
   const availableCredit =
-    input.consortiumBidKind === 'embedded' ? Math.max(0, credit0 - bid) : credit0
+    input.consortiumBidKind === 'embedded'
+      ? Math.max(0, creditAtContemplation - bid)
+      : creditAtContemplation
 
   return {
     creditValue: credit0,
     adminFee,
     reserveFund,
     bid,
+    bidKind: input.consortiumBidKind,
+    creditAtContemplation,
     availableCredit,
+    creditAvailableMonth: contemplation,
     termMonths: n,
     paidMonths: Math.max(paidMonths, installmentRows.length),
     firstInstallment: (installmentRows[0]?.installment ?? 0) + insuranceForMonth(input, credit0) + otherMonthly,

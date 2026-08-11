@@ -38,10 +38,15 @@ export function Premises({
               parcela teórica é esse total dividido pelo prazo.
             </li>
             <li>
-              Lance de {formatBRL(cons.bid)} entra uma vez, no mês {input.contemplationMonth}.
+              Lance de {formatBRL(cons.bid)} no mês {input.contemplationMonth}
+              {cons.bidKind === 'embedded'
+                ? ': embutido — reduz a carta vigente e o saldo, sem sair do caixa.'
+                : ': recursos próprios — sai do caixa e reduz o saldo. Não é desconto do custo.'}
               {input.consortiumBidMode === 'reduce_installment'
                 ? ' O saldo restante é redistribuído nas parcelas do prazo original.'
                 : ' A parcela teórica segue até zerar o saldo, encurtando o prazo.'}
+              Carta estimada na contemplação: {formatBRL(cons.creditAtContemplation)}. Crédito
+              utilizável nesta premissa: {formatBRL(cons.availableCredit)}.
             </li>
             <li>
               INPC no aniversário do grupo: {formatPct(input.consortiumAnnualAdjustmentPct)} a.a.
@@ -79,8 +84,9 @@ export function Premises({
               mês = saldo inicial × taxa. Parcela = amortização + juros.
             </li>
             <li>
-              Price: PMT = P × [i(1+i)ⁿ] / [(1+i)ⁿ − 1]. Juros = saldo × i.
-              Amortização = PMT − juros. A última parcela acerta o saldo residual.
+              Price: PMT = P × [i(1+i)ⁿ] / [(1+i)ⁿ − 1]. Com residual R, PMT usa
+              P − R/(1+i)ⁿ e o saldo final permanece o balloon. Sem residual, a última
+              parcela acerta o saldo.
             </li>
             <li>
               Entrada, IOF e tarifas iniciais saem no mês 0. Seguros e custos

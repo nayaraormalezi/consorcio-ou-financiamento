@@ -1,35 +1,58 @@
 # Consórcio ou Financiamento: qual custa menos?
 
-Simulador web **imparcial** para comparar o desembolso de um consórcio e de um financiamento a partir das mesmas premissas. Tudo roda no navegador — não há backend nem envio de dados.
+Simulador web **educativo** para comparar consórcio e financiamento a partir das premissas que você informa. Tudo roda no navegador — não há backend nem envio de dados.
 
-## Premissas financeiras (o que o modelo faz e o que não faz)
+Versão 2: o núcleo matemático (SAC, Price, NPV, consórcio linear) permanece; a modelagem de lance embutido, crédito na contemplação, residual Price e a linguagem da comparação foram alinhadas à auditoria independente.
 
-### Consórcio
+## O que o simulador calcula
 
-- Modelo **linear e transparente**, não a tabela oficial de uma administradora.
-- Encargos = crédito × (taxa de administração + fundo de reserva), diluídos no prazo.
-- **Não há juros de financiamento** no sentido SAC/Price. O custo aparece como taxa, fundo, seguro, adesão e reajuste.
-- O **lance entra uma vez** no fluxo, no mês de contemplação informado, e abate o saldo. Não é somado de novo nas parcelas.
-- Duas regras de lance: **reduzir parcelas** (prazo original) ou **reduzir prazo** (parcela teórica até zerar).
-- Lance **próprio** vs **embutido**: no embutido o crédito disponível cai; para comprar o mesmo bem o complemento ainda aparece como desembolso.
-- Reajuste anual (padrão 0%) multiplica o saldo remanescente a cada 12 meses. Contratos reais usam índices e regras de grupo que esta versão não replica.
-- O mês de contemplação é **premissa do usuário**, não previsão de sorteio.
+- Parcelas (consórcio linear; financiamento SAC ou Price)
+- Juros do financiamento e encargos do consórcio (taxa de administração, fundo de reserva)
+- Reajuste estimado da carta (INPC no aniversário do grupo)
+- Desembolsos nominais (o que sai do caixa)
+- Valor presente dos pagamentos: `PV = Σ CF_t / (1+i)^t`
 
-### Financiamento
+## O que ele NÃO prevê
 
-- O prazo do empréstimo é **independente** do prazo do grupo. O padrão de mercado para crédito imobiliário é **360 meses (30 anos)**; o teto usual no SFH/SFI é **420 meses (35 anos)**.
-- **SAC**: amortização constante; juros = saldo × taxa efetiva mensal; parcela decrescente.
-- **Price**: PMT = P × [i(1+i)ⁿ] / [(1+i)ⁿ − 1]; última parcela acerta o saldo.
-- Taxa mensal informada = **efetiva**. Anual efetiva = (1 + i)¹² − 1. Anual nominal = 12 × i. O cálculo usa sempre a efetiva mensal.
-- Entrada é desembolso inicial, não “custo extra” do bem. Total = entrada + parcelas + juros + seguros + tarifas.
-- Se o **CET** for usado e marcado como já inclusivo, seguros e tarifas da tela **não são somados de novo**.
-- Valor residual (balloon) é opcional.
+- Quando a contemplação realmente ocorrerá
+- A taxa futura de INPC (o índice informado é estimado)
+- Aprovação de crédito no banco
+- CET Bacen a partir dos fluxos, se você só cola uma taxa
+- A tabela oficial de uma administradora
+- O valor econômico de usar o bem antes (moradia, uso do veículo etc.)
 
-### Comparação
+## Premissas explícitas
 
-- Total **nominal** e **valor presente** (taxa de desconto anual efetiva configurável, padrão 10% a.a.).
-- A ferramenta **não declara** que uma modalidade é melhor em qualquer caso. Ela diz o que acontece **neste cenário**.
-- “Quando espera utilizar o crédito?” é qualitativo. O fluxo do consórcio usa o mês de contemplação.
+| Premissa | Papel no modelo |
+| --- | --- |
+| INPC | Índice **estimado** no aniversário do grupo. Sobe parcela e carta juntas. Não é juro. |
+| Contemplação | Hipótese **obrigatória**. Sem o mês informado o simulador não avança. Não é previsão de sorteio. |
+| Taxa de juros / CET informado | Substitui `i` no SAC/Price. CET informado **não** é CET calculado aqui. |
+| Taxa administrativa e fundo de reserva | Incidem sobre o crédito inicial e entram no fundo a diluir. |
+| Prazo | Consórcio e financiamento são independentes. Prazos diferentes: o total pago não é equivalente isoladamente. |
+| Lance próprio | Sai do caixa no mês da contemplação e reduz o saldo. Crédito permanece a carta vigente. |
+| Lance embutido | Não sai do caixa. Reduz o saldo e o crédito utilizável (`carta vigente − lance`). |
+
+## Matemática preservada (já auditada)
+
+- Price sem residual: `PMT = P × [i(1+i)^n] / [(1+i)^n − 1]`
+- Price com residual: `PMT = (P − R/(1+i)^n) × mesmo fator`; saldo final ≈ R (o balloon permanece como saldo, não entra no caixa)
+- SAC: amortização constante; juros = saldo × i
+- Conversão de taxas efetiva mensal ↔ anual
+- NPV dos desembolsos (não é “qual opção é melhor”)
+- Consórcio linear sem índice; lance próprio
+
+## Comparação
+
+O simulador **não declara** “melhor opção”. Mostra, neste cenário:
+
+1. Total pago
+2. Valor presente dos pagamentos
+3. Crédito efetivamente disponível
+4. Tempo até o crédito (financiamento: mês 0; consórcio: mês da hipótese)
+5. Encargos
+
+Arquitetura reservada (ainda não na UI): método de comparação `market_terms` vs `same_term`.
 
 ## Como executar localmente
 
@@ -43,56 +66,16 @@ npm run dev
 Abra o endereço indicado no terminal (em geral `http://localhost:5173`).
 
 ```bash
-npm test          # fórmulas SAC, Price, taxas, consórcio e VP
-npm run build     # gera a pasta dist/
-npm run preview   # serve o build
-```
-
-## Como publicar de graça
-
-O projeto é estático (`base: './'` no Vite), então qualquer host de arquivos serve.
-
-### Vercel
-
-1. Envie o repositório ao GitHub.
-2. Em [vercel.com](https://vercel.com), importe o projeto.
-3. Framework: Vite. Build: `npm run build`. Output: `dist`.
-
-### Netlify
-
-1. Importe o repositório em [netlify.com](https://www.netlify.com).
-2. Build: `npm run build`. Publish directory: `dist`.
-
-### Cloudflare Pages
-
-1. Novo projeto a partir do Git.
-2. Build command: `npm run build`. Output: `dist`.
-
-### GitHub Pages
-
-```bash
+npm test
+npx vitest run --config audit/vitest.config.ts   # dump para auditoria
+python3 audit/run_audit.py
 npm run build
 ```
-
-Publique o conteúdo de `dist/` (Actions com `peaceiris/actions-gh-pages`, ou arraste a pasta em Pages se o fluxo permitir). Como o `base` é relativo, também funciona em subpasta.
 
 ## Estrutura
 
 ```
 src/calc/           Fórmulas, formatação, testes
 src/components/     Interface
-src/App.tsx         Orquestração do simulador
+audit/              Motor independente (Python) e relatórios
 ```
-
-## Campos extras nesta versão
-
-Além do pedido original:
-
-- mês estimado de contemplação
-- lance próprio vs embutido
-- taxa de adesão e outros custos mensais do consórcio
-- IOF / taxas iniciais, valor residual
-- CET com opção de não duplicar custos
-- taxa de desconto para valor presente
-- cenários “e se” e cenário salvo
-- exportação do cronograma em CSV

@@ -24,7 +24,7 @@ export function downloadComparisonPdf(input: SimulatorInput, result: ComparisonR
     ? `As lentes discordam. No total nominal, ${result.cheaperNominal === 'consortium' ? 'o consórcio' : 'o financiamento'} desembolsaria menos (${formatBRL(Math.abs(result.nominalDiff))}). No valor presente, ${result.cheaperNpv === 'consortium' ? 'o consórcio' : 'o financiamento'} fica menor (${formatBRL(Math.abs(result.npvDiff))}).`
     : result.cheaperNominal === 'tie'
       ? 'Neste cenário, total pago e valor presente ficam praticamente iguais.'
-      : `Nas duas lentes, ${result.cheaperNominal === 'consortium' ? 'o consórcio' : 'o financiamento'} desembolsaria menos. Isso não é uma recomendação.`
+      : `Neste cenário, ${result.cheaperNominal === 'consortium' ? 'o consórcio' : 'o financiamento'} apresenta menor desembolso nominal e menor valor presente dos pagamentos. Isso mede pagamentos, não qual produto é melhor.`
 
   doc.setFillColor(...PRIMARY)
   doc.rect(0, 0, pageWidth, 28, 'F')
@@ -63,7 +63,10 @@ export function downloadComparisonPdf(input: SimulatorInput, result: ComparisonR
     head: [['Indicador', 'Consórcio', 'Financiamento']],
     body: [
       ['Crédito original', formatBRL(cons.creditValue), formatBRL(fin.creditValue)],
-      ['Crédito ao fim do plano', formatBRL(cons.finalCreditValue), formatBRL(fin.creditValue)],
+      ['Crédito estimado na contemplação', formatBRL(cons.creditAtContemplation), formatBRL(fin.creditValue)],
+      ['Crédito utilizável', formatBRL(cons.availableCredit), formatBRL(fin.financedAmount + fin.downPayment)],
+      ['Tempo até o crédito', `mês ${cons.creditAvailableMonth}`, 'mês 0'],
+      ['Carta após reajustes', formatBRL(cons.finalCreditValue), formatBRL(fin.creditValue)],
       ['Lance / Entrada', formatBRL(cons.bid), formatBRL(fin.downPayment)],
       ['Prazo efetivo', formatCompactMonths(cons.paidMonths), formatCompactMonths(fin.termMonths)],
       ['Parcela inicial', formatBRL(cons.firstInstallment), formatBRL(fin.firstInstallment)],
@@ -71,8 +74,8 @@ export function downloadComparisonPdf(input: SimulatorInput, result: ComparisonR
       ['Juros', 'Não se aplica', formatBRL(fin.totalInterest)],
       ['Taxa de administração', formatBRL(cons.adminFee), '—'],
       ['Fundo de reserva', formatBRL(cons.reserveFund), '—'],
-      ['INPC no total pago', formatBRL(cons.totalReajustmentExtra), '—'],
-      ['Custo além do crédito', formatBRL(result.consortiumCostBeyondCredit), formatBRL(result.financingCostBeyondCredit)],
+      ['Impacto do reajuste', formatBRL(cons.totalReajustmentExtra), '—'],
+      ['Encargos', formatBRL(result.consortiumCostBeyondCredit), formatBRL(result.financingCostBeyondCredit)],
       ['Seguros', formatBRL(cons.totalInsurance), formatBRL(fin.totalInsurance)],
       [
         'Outras taxas',
@@ -80,7 +83,7 @@ export function downloadComparisonPdf(input: SimulatorInput, result: ComparisonR
         formatBRL(fin.totalUpfrontFees + fin.totalMonthlyExtras),
       ],
       ['Total desembolsado', formatBRL(cons.totalDisbursed), formatBRL(fin.totalDisbursed)],
-      ['Valor presente', formatBRL(cons.npv), formatBRL(fin.npv)],
+      ['Valor presente dos pagamentos', formatBRL(cons.npv), formatBRL(fin.npv)],
     ],
     theme: 'grid',
     styles: {
@@ -101,7 +104,7 @@ export function downloadComparisonPdf(input: SimulatorInput, result: ComparisonR
       2: { cellWidth: 60 },
     },
     didParseCell: (data) => {
-      if (data.section === 'body' && data.row.index >= 13) {
+      if (data.section === 'body' && data.row.index >= 16) {
         data.cell.styles.fontStyle = 'bold'
       }
     },
@@ -120,12 +123,17 @@ export function downloadComparisonPdf(input: SimulatorInput, result: ComparisonR
         'INPC no aniversário do grupo',
         `${formatPct(input.consortiumAnnualAdjustmentPct)} a.a. · 1º aniversário no mês ${input.consortiumFirstAnniversaryMonth} · aplicado ${cons.inpcApplications}x`,
       ],
-      ['Lance', input.consortiumHasBid ? formatBRL(cons.bid) : 'Não informado'],
-      ['Contemplação estimada', `Mês ${input.contemplationMonth}`],
+      [
+        'Lance',
+        input.consortiumHasBid
+          ? `${formatBRL(cons.bid)} (${cons.bidKind === 'embedded' ? 'embutido, não sai do caixa' : 'próprio'})`
+          : 'Não informado',
+      ],
+      ['Contemplação (hipótese)', `Mês ${input.contemplationMonth} — não é previsão`],
       ['Entrada', formatBRL(fin.downPayment)],
       [
         'Juros / CET',
-        `${fin.rateSource === 'cet' ? 'CET' : 'Taxa de juros'} ${formatRateMonthly(fin.monthlyRate * 100)} efetiva (${formatRateAnnual(fin.annualEffectiveRate * 100)} efetiva) · ${fin.system.toUpperCase()}`,
+        `${fin.rateSource === 'cet' ? 'CET informado' : 'Taxa de juros'} ${formatRateMonthly(fin.monthlyRate * 100)} efetiva (${formatRateAnnual(fin.annualEffectiveRate * 100)} efetiva) · ${fin.system.toUpperCase()}`,
       ],
       ['Taxa de desconto (valor presente)', `${formatPct(input.discountAnnualPct)} a.a.`],
     ],
