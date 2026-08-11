@@ -106,58 +106,65 @@ export function FinancingForm({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-5 sm:grid-cols-2">
-        <Field
-          label="Taxa de juros"
-          hint={`Usamos ${formatRateMonthly(input.rateMonthlyPct)} efetiva · equivalente ${annualLabel}.`}
-          help="É o preço do dinheiro emprestado. Informe a taxa do contrato, de preferência a efetiva. Se você só tiver a anual, mude para % a.a. O simulador converte e calcula sempre com a taxa efetiva mensal."
-        >
-          <Segmented<RateInputMode>
-            value={input.rateInputMode}
-            onChange={(rateInputMode) => onChange({ rateInputMode })}
-            options={[
-              { value: 'monthly', label: '% a.m.' },
-              { value: 'annual', label: '% a.a.' },
-            ]}
-          />
-          <div className="mt-2">
-            {input.rateInputMode === 'monthly' ? (
-              <PercentInput
-                value={input.rateMonthlyPct}
-                onChange={(rateMonthlyPct) =>
-                  onChange({
-                    rateMonthlyPct,
-                    rateInputMode: 'monthly',
-                    rateAnnualPct: rateToPct(
-                      effectiveAnnualFromMonthly(pctToRate(rateMonthlyPct)),
-                    ),
-                  })
-                }
-              />
-            ) : (
-              <PercentInput
-                value={input.rateAnnualPct}
-                onChange={(rateAnnualPct) =>
-                  onChange({ rateAnnualPct, rateInputMode: 'annual' })
-                }
-              />
-            )}
-          </div>
-        </Field>
-        <Field
-          label="Tipo da taxa anual"
-          help="Nominal é a taxa mensal multiplicada por 12. Efetiva considera o juro sobre juro do ano: (1 + mensal)¹² − 1. Se o banco disser “12% a.a. nominal”, escolha nominal. Se disser “taxa efetiva”, escolha efetiva."
-        >
-          <Segmented<AnnualRateKind>
-            value={input.annualRateKind}
-            onChange={(annualRateKind) => onChange({ annualRateKind })}
-            options={[
-              { value: 'effective', label: 'Efetiva' },
-              { value: 'nominal', label: 'Nominal' },
-            ]}
-          />
-        </Field>
-      </div>
+      {!input.useCet ? (
+        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+          <Field
+            label="Taxa de juros"
+            hint={`Usamos ${formatRateMonthly(input.rateMonthlyPct)} efetiva · equivalente ${annualLabel}.`}
+            help="É o preço do dinheiro emprestado. Informe a taxa do contrato, de preferência a efetiva. Se você só tiver a anual, mude para % a.a. O simulador converte e calcula sempre com a taxa efetiva mensal."
+          >
+            <Segmented<RateInputMode>
+              value={input.rateInputMode}
+              onChange={(rateInputMode) => onChange({ rateInputMode })}
+              options={[
+                { value: 'monthly', label: '% a.m.' },
+                { value: 'annual', label: '% a.a.' },
+              ]}
+            />
+            <div className="mt-2">
+              {input.rateInputMode === 'monthly' ? (
+                <PercentInput
+                  value={input.rateMonthlyPct}
+                  onChange={(rateMonthlyPct) =>
+                    onChange({
+                      rateMonthlyPct,
+                      rateInputMode: 'monthly',
+                      rateAnnualPct: rateToPct(
+                        effectiveAnnualFromMonthly(pctToRate(rateMonthlyPct)),
+                      ),
+                    })
+                  }
+                />
+              ) : (
+                <PercentInput
+                  value={input.rateAnnualPct}
+                  onChange={(rateAnnualPct) =>
+                    onChange({ rateAnnualPct, rateInputMode: 'annual' })
+                  }
+                />
+              )}
+            </div>
+          </Field>
+          <Field
+            label="Tipo da taxa anual"
+            help="Nominal é a taxa mensal multiplicada por 12. Efetiva considera o juro sobre juro do ano: (1 + mensal)¹² − 1. Se o banco disser “12% a.a. nominal”, escolha nominal. Se disser “taxa efetiva”, escolha efetiva."
+          >
+            <Segmented<AnnualRateKind>
+              value={input.annualRateKind}
+              onChange={(annualRateKind) => onChange({ annualRateKind })}
+              options={[
+                { value: 'effective', label: 'Efetiva' },
+                { value: 'nominal', label: 'Nominal' },
+              ]}
+            />
+          </Field>
+        </div>
+      ) : (
+        <p className="mt-6 rounded-xl bg-paper px-4 py-3 text-sm leading-relaxed text-muted">
+          A taxa de juros está oculta. Com o CET informado ligado, ela não entra no
+          cálculo — só o CET da proposta.
+        </p>
+      )}
 
       <div className="mt-6">
         <Field
@@ -195,6 +202,19 @@ export function FinancingForm({
                 onChange={(cetAnnualPct) =>
                   onChange({ cetAnnualPct, cetInputMode: 'annual' })
                 }
+              />
+            </Field>
+            <Field
+              label="Tipo da taxa anual do CET"
+              help="Se o CET da proposta estiver em % a.a., diga se é efetivo ou nominal. CET no Brasil em geral é taxa efetiva."
+            >
+              <Segmented<AnnualRateKind>
+                value={input.annualRateKind}
+                onChange={(annualRateKind) => onChange({ annualRateKind })}
+                options={[
+                  { value: 'effective', label: 'Efetiva' },
+                  { value: 'nominal', label: 'Nominal' },
+                ]}
               />
             </Field>
           </div>
