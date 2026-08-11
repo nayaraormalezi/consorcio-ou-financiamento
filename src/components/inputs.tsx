@@ -5,17 +5,19 @@ export function CurrencyInput({
   value,
   onChange,
   id,
+  className = '',
 }: {
   value: number
   onChange: (value: number) => void
   id?: string
+  className?: string
 }) {
   return (
     <input
       id={id}
       inputMode="numeric"
       autoComplete="off"
-      className={inputClass}
+      className={`${inputClass} ${className}`.trim()}
       value={formatBRL(value)}
       onChange={(event) => {
         const digits = event.target.value.replace(/\D/g, '')

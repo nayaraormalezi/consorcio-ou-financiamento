@@ -3,6 +3,8 @@ import { effectiveAnnualFromMonthly, pctToRate, rateToPct } from './rates'
 
 export const TERM_PRESETS = [36, 48, 60, 72, 84, 120, 180, 240, 360] as const
 
+export const CREDIT_VALUE_PRESETS = [150_000, 200_000, 300_000, 500_000, 800_000, 1_000_000] as const
+
 /** Prazos usuais de crédito imobiliário no Brasil (SFH/SFI). 360 meses é o padrão de mercado; 420, o teto mais comum. */
 export const FINANCING_TERM_PRESETS = [180, 240, 300, 360, 420] as const
 
