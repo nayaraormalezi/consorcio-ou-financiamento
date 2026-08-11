@@ -269,13 +269,13 @@ function errorsForStep(current: number, input: SimulatorInput): string[] {
   if (current === 1) {
     const errors: string[] = []
     if (input.creditValue <= 0) errors.push('Informe um valor de crédito maior que zero.')
-    if (input.termMonths < 1 || input.termMonths > 420) {
-      errors.push('O prazo do consórcio deve estar entre 1 e 420 meses.')
-    }
     return errors
   }
   if (current === 2) {
     const errors: string[] = []
+    if (input.termMonths < 1 || input.termMonths > 420) {
+      errors.push('O prazo do consórcio deve estar entre 1 e 420 meses.')
+    }
     if (input.consortiumHasBid && input.consortiumBid < 0) {
       errors.push('O lance não pode ser negativo.')
     }

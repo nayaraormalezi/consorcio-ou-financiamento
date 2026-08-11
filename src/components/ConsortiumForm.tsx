@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { formatBRL } from '../calc/format'
+import { TERM_PRESETS } from '../calc/defaults'
+import { formatBRL, formatCompactMonths } from '../calc/format'
 import type { BidKind, BidMode, InsuranceMode, SimulatorInput } from '../calc/types'
 import { CurrencyInput, IntegerInput, PercentInput } from './inputs'
 import { Card, Field, OptionalBlock, Segmented, SectionTitle } from './ui'
@@ -18,9 +19,43 @@ export function ConsortiumForm({
       <SectionTitle
         step="Etapa 2 · Consórcio"
         title="Condições do consórcio"
-        subtitle="Preencha o essencial. Lance, seguro e taxas extras só aparecem se você disser que existem."
+        subtitle="Comece pelo prazo do grupo. Lance, seguro e taxas extras só aparecem se você disser que existem."
       />
-      <div className="grid gap-5 sm:grid-cols-2">
+      <Field
+        label="Prazo do consórcio"
+        hint={formatCompactMonths(input.termMonths)}
+        help="É o prazo do grupo: em quantos meses o crédito e as taxas se diluem. Não é o prazo do financiamento — esse fica na etapa 3, no padrão de mercado (em geral 360 meses para imóvel)."
+      >
+        <IntegerInput
+          value={input.termMonths}
+          onChange={(termMonths) => onChange({ termMonths })}
+          min={1}
+          max={420}
+        />
+      </Field>
+      <div className="mt-4">
+        <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">
+          Seleção rápida de prazo do grupo
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {TERM_PRESETS.map((months) => (
+            <button
+              key={months}
+              type="button"
+              onClick={() => onChange({ termMonths: months })}
+              className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                input.termMonths === months
+                  ? 'border-cons bg-cons-soft text-cons'
+                  : 'border-line bg-white text-ink hover:border-primary'
+              }`}
+            >
+              {months} meses
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-5 sm:grid-cols-2">
         <Field
           label="Taxa de administração total"
           hint="Não é juros. É a remuneração da administradora, diluída no prazo."

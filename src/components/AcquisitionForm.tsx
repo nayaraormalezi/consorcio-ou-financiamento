@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react'
-import { TERM_PRESETS } from '../calc/defaults'
-import { formatCompactMonths } from '../calc/format'
 import type { CreditTiming, SimulatorInput } from '../calc/types'
-import { CurrencyInput, IntegerInput } from './inputs'
+import { CurrencyInput } from './inputs'
 import { Card, Field, Segmented, SectionTitle } from './ui'
 
 export function AcquisitionForm({
@@ -19,9 +17,9 @@ export function AcquisitionForm({
       <SectionTitle
         step="Etapa 1"
         title="Quanto você precisa?"
-        subtitle="Informe o valor do bem e o prazo do grupo de consórcio. O financiamento tem prazo próprio na etapa 3 — no mercado imobiliário o padrão é 30 anos."
+        subtitle="Informe o valor do bem. O prazo do grupo fica na etapa do consórcio; o do empréstimo, na etapa do financiamento."
       />
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div>
         <Field
           label="Valor desejado"
           hint="Use o preço do bem ou o crédito que você busca."
@@ -32,39 +30,6 @@ export function AcquisitionForm({
             onChange={(creditValue) => onChange({ creditValue })}
           />
         </Field>
-        <Field
-          label="Prazo do consórcio"
-          hint={formatCompactMonths(input.termMonths)}
-          help="É o prazo do grupo: em quantos meses o crédito e as taxas se diluem. Não é o prazo do financiamento — esse você informa na etapa 3, no padrão de mercado (em geral 360 meses para imóvel)."
-        >
-          <IntegerInput
-            value={input.termMonths}
-            onChange={(termMonths) => onChange({ termMonths })}
-            min={1}
-            max={420}
-          />
-        </Field>
-      </div>
-      <div className="mt-4">
-        <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">
-          Seleção rápida de prazo do grupo
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {TERM_PRESETS.map((months) => (
-            <button
-              key={months}
-              type="button"
-              onClick={() => onChange({ termMonths: months })}
-              className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                input.termMonths === months
-                  ? 'border-primary bg-primary text-white'
-                  : 'border-line bg-white text-ink hover:border-primary'
-              }`}
-            >
-              {months} meses
-            </button>
-          ))}
-        </div>
       </div>
       <div className="mt-6">
         <Field
