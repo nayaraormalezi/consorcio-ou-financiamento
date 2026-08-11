@@ -7,6 +7,7 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
     const input = createDefaultInput()
     input.consortiumAnnualAdjustmentPct = 0
     input.consortiumHasBid = true
+    input.financingTermMonths = 120
     const result = simulate(input)
     const expectedInterest = ((0.01 * 240_000) / 2) * 121
 
@@ -37,6 +38,7 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
     input.consortiumHasInsurance = false
     input.consortiumHasMembershipFee = false
     input.consortiumHasOtherMonthly = false
+    input.financingTermMonths = 120
 
     const result = simulate(input)
     expect(result.consortium.bid).toBe(0)
@@ -44,12 +46,25 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
   })
 
   it('separa custo além do crédito e detecta quando total e VP discordam', () => {
-    const result = simulate(createDefaultInput())
+    const input = createDefaultInput()
+    input.financingTermMonths = 120
+    const result = simulate(input)
     expect(result.consortiumCostBeyondCredit).toBeGreaterThan(result.consortium.adminFee)
     expect(result.financingCostBeyondCredit).toBeCloseTo(result.financing.totalInterest, 2)
     expect(result.creditPurchasingPowerGain).toBeGreaterThan(0)
     expect(result.metricsDisagree).toBe(true)
     expect(result.cheaperNominal).toBe('financing')
     expect(result.cheaperNpv).toBe('consortium')
+  })
+
+  it('usa prazo de financiamento independente, no padrão de 360 meses', () => {
+    const result = simulate(createDefaultInput())
+    expect(result.errors).toHaveLength(0)
+    expect(result.consortium.termMonths).toBe(120)
+    expect(result.financing.termMonths).toBe(360)
+    expect(result.financing.schedule).toHaveLength(360)
+    const expectedInterest = ((0.01 * 240_000) / 2) * (360 + 1)
+    expect(result.financing.totalInterest).toBeCloseTo(expectedInterest, 2)
+    expect(result.cheaperNominal).toBe('consortium')
   })
 })

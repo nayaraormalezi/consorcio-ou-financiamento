@@ -60,6 +60,11 @@ export function Premises({
           <h4 className="text-sm font-semibold tracking-wide text-fin uppercase">Financiamento</h4>
           <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted">
             <li>
+              Prazo do contrato = {fin.termMonths} meses (independente do grupo de
+              consórcio, {input.termMonths} meses). Padrão de mercado para imóvel: 360
+              meses; teto usual: 420.
+            </li>
+            <li>
               Valor financiado = crédito − entrada = {formatBRL(fin.financedAmount)}.
             </li>
             <li>

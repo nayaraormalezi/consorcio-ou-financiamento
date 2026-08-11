@@ -65,7 +65,7 @@ export function downloadComparisonPdf(input: SimulatorInput, result: ComparisonR
       ['Crédito original', formatBRL(cons.creditValue), formatBRL(fin.creditValue)],
       ['Crédito ao fim do plano', formatBRL(cons.finalCreditValue), formatBRL(fin.creditValue)],
       ['Lance / Entrada', formatBRL(cons.bid), formatBRL(fin.downPayment)],
-      ['Prazo efetivo', formatCompactMonths(cons.paidMonths), formatCompactMonths(input.termMonths)],
+      ['Prazo efetivo', formatCompactMonths(cons.paidMonths), formatCompactMonths(fin.termMonths)],
       ['Parcela inicial', formatBRL(cons.firstInstallment), formatBRL(fin.firstInstallment)],
       ['Parcela final', formatBRL(cons.lastInstallment), formatBRL(fin.lastInstallment)],
       ['Juros', 'Não se aplica', formatBRL(fin.totalInterest)],
@@ -112,7 +112,8 @@ export function downloadComparisonPdf(input: SimulatorInput, result: ComparisonR
     head: [['Premissas usadas nesta simulação', '']],
     body: [
       ['Crédito / bem', formatBRL(input.creditValue)],
-      ['Prazo informado', formatCompactMonths(input.termMonths)],
+      ['Prazo do consórcio', formatCompactMonths(input.termMonths)],
+      ['Prazo do financiamento', formatCompactMonths(fin.termMonths)],
       ['Taxa de administração', formatPct(input.consortiumAdminFeePct)],
       ['Fundo de reserva', formatPct(input.consortiumReservePct)],
       [

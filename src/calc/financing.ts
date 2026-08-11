@@ -27,7 +27,7 @@ export function simulateFinancing(
   extrasIncludedInCet: boolean,
 ): FinancingResult {
   const creditValue = Math.max(0, input.creditValue)
-  const n = Math.max(1, Math.round(input.termMonths))
+  const n = Math.max(1, Math.round(input.financingTermMonths || input.termMonths))
   const downPayment = Math.min(Math.max(0, input.downPayment), creditValue)
   const residual = Math.min(Math.max(0, input.residualValue), creditValue - downPayment)
   const financedAmount = roundCents(creditValue - downPayment)
@@ -119,6 +119,7 @@ export function simulateFinancing(
     creditValue,
     downPayment,
     financedAmount,
+    termMonths: n,
     system,
     monthlyRate,
     annualEffectiveRate: (1 + monthlyRate) ** 12 - 1,

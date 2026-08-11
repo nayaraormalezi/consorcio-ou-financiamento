@@ -41,7 +41,7 @@ export function ResultsPanel({
           </div>
         </div>
         <p className="mb-5 rounded-xl bg-primary-soft px-4 py-3 text-sm leading-relaxed text-ink">
-          Exemplo: R$ 10.000 hoje e R$ 10.000 daqui a 10 anos somam R$ 20.000 no{' '}
+          Exemplo: R$ 10.000 hoje e R$ 10.000 daqui a 30 anos somam R$ 20.000 no{' '}
           <strong>total desembolsado</strong>. No <strong>valor presente</strong>, a segunda parcela
           vale menos do que R$ 10.000, porque está longe. Por isso um plano com parcelas tardias
           (consórcio com INPC) pode perder no total e ganhar no valor presente — ou o contrário.
@@ -140,7 +140,7 @@ export function ResultsPanel({
               <Row
                 label="Prazo efetivo"
                 a={formatCompactMonths(cons.paidMonths)}
-                b={formatCompactMonths(input.termMonths)}
+                b={formatCompactMonths(fin.termMonths)}
               />
               <Row
                 label="Parcela inicial"
@@ -242,7 +242,8 @@ export function ResultsPanel({
             Sistema {fin.system.toUpperCase()} · taxa{' '}
             {fin.rateSource === 'cet' ? 'CET' : 'de juros'} de{' '}
             {formatPct(fin.monthlyRate * 100, 4)} a.m. efetiva (
-            {formatPct(fin.annualEffectiveRate * 100, 2)} a.a. efetiva).
+            {formatPct(fin.annualEffectiveRate * 100, 2)} a.a. efetiva) ·{' '}
+            {formatCompactMonths(fin.termMonths)}.
           </p>
         </Card>
       </div>

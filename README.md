@@ -17,6 +17,7 @@ Simulador web **imparcial** para comparar o desembolso de um consórcio e de um 
 
 ### Financiamento
 
+- O prazo do empréstimo é **independente** do prazo do grupo. O padrão de mercado para crédito imobiliário é **360 meses (30 anos)**; o teto usual no SFH/SFI é **420 meses (35 anos)**.
 - **SAC**: amortização constante; juros = saldo × taxa efetiva mensal; parcela decrescente.
 - **Price**: PMT = P × [i(1+i)ⁿ] / [(1+i)ⁿ − 1]; última parcela acerta o saldo.
 - Taxa mensal informada = **efetiva**. Anual efetiva = (1 + i)¹² − 1. Anual nominal = 12 × i. O cálculo usa sempre a efetiva mensal.

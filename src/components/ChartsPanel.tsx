@@ -55,8 +55,9 @@ export function ChartsPanel({ result }: { result: ComparisonResult }) {
       <Card>
         <h3 className="font-display text-xl font-medium">Evolução das parcelas</h3>
         <p className="mt-1 text-sm text-muted">
-          Consórcio e financiamento, mês a mês. No SAC a parcela de amortização +
-          juros cai; seguros mensais entram no total exibido.
+          Consórcio e financiamento, mês a mês. Os prazos podem ser diferentes —
+          o financiamento segue o contrato bancário (padrão 360 meses). No SAC a
+          parcela de amortização + juros cai; seguros mensais entram no total.
         </p>
         <div className="mt-4 h-72 w-full">
           <ResponsiveContainer>

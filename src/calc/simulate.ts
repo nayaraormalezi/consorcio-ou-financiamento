@@ -7,7 +7,10 @@ export function validateInput(input: SimulatorInput): string[] {
   const errors: string[] = []
   if (input.creditValue <= 0) errors.push('Informe um valor de crédito maior que zero.')
   if (input.termMonths < 1 || input.termMonths > 420) {
-    errors.push('O prazo deve estar entre 1 e 420 meses.')
+    errors.push('O prazo do consórcio deve estar entre 1 e 420 meses.')
+  }
+  if (input.financingTermMonths < 1 || input.financingTermMonths > 420) {
+    errors.push('O prazo do financiamento deve estar entre 1 e 420 meses.')
   }
   if (input.downPayment > input.creditValue) {
     errors.push('A entrada não pode ser maior que o valor do crédito.')
@@ -164,6 +167,10 @@ export function syncDerivedFields(input: SimulatorInput): SimulatorInput {
   next.consortiumFirstAnniversaryMonth = Math.min(
     Math.max(1, Math.round(next.consortiumFirstAnniversaryMonth || 13)),
     Math.max(1, next.termMonths + 12),
+  )
+  next.financingTermMonths = Math.min(
+    420,
+    Math.max(1, Math.round(next.financingTermMonths || next.termMonths)),
   )
 
   return next

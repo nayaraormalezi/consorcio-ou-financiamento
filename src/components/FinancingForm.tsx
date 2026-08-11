@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { formatBRL, formatRateAnnual, formatRateMonthly } from '../calc/format'
+import { FINANCING_TERM_PRESETS } from '../calc/defaults'
+import { formatBRL, formatCompactMonths, formatRateAnnual, formatRateMonthly } from '../calc/format'
 import { effectiveAnnualFromMonthly, pctToRate, rateToPct } from '../calc/rates'
 import type {
   AmortizationSystem,
@@ -7,7 +8,7 @@ import type {
   RateInputMode,
   SimulatorInput,
 } from '../calc/types'
-import { CurrencyInput, PercentInput } from './inputs'
+import { CurrencyInput, IntegerInput, PercentInput } from './inputs'
 import { Card, Field, Hint, OptionalBlock, Segmented, SectionTitle } from './ui'
 
 export function FinancingForm({
@@ -29,10 +30,22 @@ export function FinancingForm({
       <SectionTitle
         step="Etapa 3 · Financiamento"
         title="Condições do financiamento"
-        subtitle="Entrada, juros e sistema de amortização já bastam para comparar. Seguro e tarifas só aparecem se você ligar."
+        subtitle="O prazo do empréstimo é independente do grupo de consórcio. Entrada, juros e sistema já bastam para comparar. Seguro e tarifas só aparecem se você ligar."
       />
 
       <div className="grid gap-5 sm:grid-cols-2">
+        <Field
+          label="Prazo do financiamento"
+          hint={formatCompactMonths(input.financingTermMonths)}
+          help="No crédito imobiliário brasileiro o contrato mais comum é de 360 meses (30 anos). O teto usual no SFH/SFI é 420 meses (35 anos). Prazo maior reduz a parcela e aumenta o total de juros — é assim que o financiamento funciona no mercado, não no mesmo prazo do consórcio."
+        >
+          <IntegerInput
+            value={input.financingTermMonths}
+            onChange={(financingTermMonths) => onChange({ financingTermMonths })}
+            min={1}
+            max={420}
+          />
+        </Field>
         <Field
           label="Entrada"
           hint={`Equivale a ${formatBRL(input.downPayment)}. É parte do preço, paga no início.`}
@@ -66,6 +79,31 @@ export function FinancingForm({
             ]}
           />
         </Field>
+      </div>
+      <div className="mt-4">
+        <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">
+          Prazos usuais no crédito imobiliário
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {FINANCING_TERM_PRESETS.map((months) => (
+            <button
+              key={months}
+              type="button"
+              onClick={() => onChange({ financingTermMonths: months })}
+              className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                input.financingTermMonths === months
+                  ? 'border-primary bg-primary text-white'
+                  : 'border-line bg-white text-ink hover:border-primary'
+              }`}
+            >
+              {months === 360
+                ? '360 meses · padrão'
+                : months === 420
+                  ? '420 meses · teto'
+                  : `${months} meses`}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">

@@ -9,6 +9,7 @@ describe('SAC', () => {
     input.creditValue = 300_000
     input.downPayment = 60_000
     input.termMonths = 120
+    input.financingTermMonths = 120
     input.amortization = 'sac'
     input.residualValue = 0
 
@@ -48,6 +49,7 @@ describe('Price', () => {
   it('parcela constante e amortização + juros = PMT', () => {
     const input = createDefaultInput()
     input.amortization = 'price'
+    input.financingTermMonths = 120
     const i = 0.01
     const n = 120
     const P = 240_000
@@ -78,6 +80,7 @@ describe('CET', () => {
     input.financingInsuranceMonthly = 200
     input.originationFee = 3_000
     input.amortization = 'sac'
+    input.financingTermMonths = 120
 
     const withExtras = simulateFinancing(input, 0.01, false)
     const cetOnly = simulateFinancing(input, 0.012, true)

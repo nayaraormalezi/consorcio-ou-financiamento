@@ -10,6 +10,7 @@ export type MoneyPctField = 'money' | 'pct'
 export interface SimulatorInput {
   creditValue: number
   termMonths: number
+  financingTermMonths: number
   creditTiming: CreditTiming
 
   consortiumAdminFeePct: number
@@ -117,6 +118,7 @@ export interface FinancingResult {
   creditValue: number
   downPayment: number
   financedAmount: number
+  termMonths: number
   system: AmortizationSystem
   monthlyRate: number
   annualEffectiveRate: number

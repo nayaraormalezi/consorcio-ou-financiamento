@@ -38,7 +38,11 @@ export function CostVsTime({
           <p className="text-xs font-semibold tracking-wide text-fin uppercase">Financiamento</p>
           <p className="mt-2 text-sm leading-relaxed">
             Acesso típico ao bem no início da operação, se houver aprovação de crédito.
-            Você começa a pagar juros imediatamente sobre o saldo.
+            Você começa a pagar juros imediatamente sobre o saldo. O contrato
+            desta simulação tem {formatCompactMonths(result.financing.termMonths)}
+            {result.financing.termMonths !== input.termMonths
+              ? ` — prazo de mercado, diferente dos ${formatCompactMonths(input.termMonths)} do consórcio.`
+              : '.'}
           </p>
           <p className="mt-3 text-sm font-medium">
             Desembolso total {formatBRL(result.financing.totalDisbursed)} · VP{' '}

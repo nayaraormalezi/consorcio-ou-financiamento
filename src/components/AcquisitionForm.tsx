@@ -19,7 +19,7 @@ export function AcquisitionForm({
       <SectionTitle
         step="Etapa 1"
         title="Quanto você precisa?"
-        subtitle="Informe o valor do bem e em quanto tempo pretende pagar. Os números desta tela são um ponto de partida — você pode mudar tudo."
+        subtitle="Informe o valor do bem e o prazo do grupo de consórcio. O financiamento tem prazo próprio na etapa 3 — no mercado imobiliário o padrão é 30 anos."
       />
       <div className="grid gap-5 sm:grid-cols-2">
         <Field
@@ -33,9 +33,9 @@ export function AcquisitionForm({
           />
         </Field>
         <Field
-          label="Prazo"
+          label="Prazo do consórcio"
           hint={formatCompactMonths(input.termMonths)}
-          help="Quantos meses o contrato duraria. No consórcio é o prazo do grupo. No financiamento é o tempo para quitar o empréstimo. Prazos maiores diminuem a parcela e aumentam o total pago."
+          help="É o prazo do grupo: em quantos meses o crédito e as taxas se diluem. Não é o prazo do financiamento — esse você informa na etapa 3, no padrão de mercado (em geral 360 meses para imóvel)."
         >
           <IntegerInput
             value={input.termMonths}
@@ -47,7 +47,7 @@ export function AcquisitionForm({
       </div>
       <div className="mt-4">
         <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">
-          Seleção rápida de prazo
+          Seleção rápida de prazo do grupo
         </p>
         <div className="flex flex-wrap gap-2">
           {TERM_PRESETS.map((months) => (

@@ -270,7 +270,7 @@ function errorsForStep(current: number, input: SimulatorInput): string[] {
     const errors: string[] = []
     if (input.creditValue <= 0) errors.push('Informe um valor de crédito maior que zero.')
     if (input.termMonths < 1 || input.termMonths > 420) {
-      errors.push('O prazo deve estar entre 1 e 420 meses.')
+      errors.push('O prazo do consórcio deve estar entre 1 e 420 meses.')
     }
     return errors
   }
@@ -286,6 +286,9 @@ function errorsForStep(current: number, input: SimulatorInput): string[] {
   }
   if (current === 3) {
     const errors: string[] = []
+    if (input.financingTermMonths < 1 || input.financingTermMonths > 420) {
+      errors.push('O prazo do financiamento deve estar entre 1 e 420 meses.')
+    }
     if (input.downPayment > input.creditValue) {
       errors.push('A entrada não pode ser maior que o valor do crédito.')
     }
