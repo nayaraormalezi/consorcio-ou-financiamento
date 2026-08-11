@@ -17,6 +17,8 @@ export interface SimulatorInput {
   consortiumInsuranceMode: InsuranceMode
   consortiumInsuranceMonthly: number
   consortiumInsurancePct: number
+  consortiumHasInsurance: boolean
+  consortiumHasBid: boolean
   consortiumBid: number
   consortiumBidPct: number
   consortiumBidLastEdited: MoneyPctField
@@ -24,7 +26,9 @@ export interface SimulatorInput {
   consortiumBidKind: BidKind
   consortiumAnnualAdjustmentPct: number
   consortiumFirstAnniversaryMonth: number
+  consortiumHasMembershipFee: boolean
   consortiumMembershipFee: number
+  consortiumHasOtherMonthly: boolean
   consortiumOtherMonthly: number
   contemplationMonth: number
 
@@ -36,12 +40,15 @@ export interface SimulatorInput {
   rateInputMode: RateInputMode
   annualRateKind: AnnualRateKind
   amortization: AmortizationSystem
+  financingHasInsurance: boolean
   financingInsuranceMonthly: number
+  financingHasOtherCosts: boolean
   originationFee: number
   appraisalFee: number
   registryFee: number
   otherUpfront: number
   financingOtherMonthly: number
+  financingHasResidual: boolean
   residualValue: number
   useCet: boolean
   cetMonthlyPct: number

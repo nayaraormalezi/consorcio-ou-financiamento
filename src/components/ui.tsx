@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 export function Card({
   children,
@@ -22,18 +22,122 @@ export function Card({
 export function Field({
   label,
   hint,
+  help,
   children,
 }: {
   label: string
   hint?: string
+  help?: ReactNode
   children: ReactNode
 }) {
+  const [showHelp, setShowHelp] = useState(false)
   return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-sm font-medium text-ink">{label}</span>
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-ink">{label}</span>
+        {help ? (
+          <button
+            type="button"
+            onClick={() => setShowHelp((open) => !open)}
+            className="grid size-5 shrink-0 place-items-center rounded-full border border-primary text-[11px] font-semibold text-primary"
+            aria-expanded={showHelp}
+            aria-label={`O que significa ${label}?`}
+          >
+            ?
+          </button>
+        ) : null}
+      </div>
+      {showHelp && help ? (
+        <p className="rounded-xl bg-primary-soft px-3 py-2 text-xs leading-relaxed text-ink">
+          {help}
+        </p>
+      ) : null}
       {children}
       {hint ? <span className="text-xs leading-relaxed text-muted">{hint}</span> : null}
-    </label>
+    </div>
+  )
+}
+
+export function Switch({
+  checked,
+  onChange,
+  label,
+  description,
+}: {
+  checked: boolean
+  onChange: (value: boolean) => void
+  label: string
+  description?: string
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className="flex w-full items-center justify-between gap-4 text-left"
+    >
+      <span>
+        <span className="block text-sm font-medium text-ink">{label}</span>
+        {description ? (
+          <span className="mt-0.5 block text-xs leading-relaxed text-muted">{description}</span>
+        ) : null}
+      </span>
+      <span
+        className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+          checked ? 'bg-primary' : 'bg-disabled'
+        }`}
+      >
+        <span
+          className={`absolute top-0.5 size-5 rounded-full bg-white transition ${
+            checked ? 'left-5' : 'left-0.5'
+          }`}
+        />
+      </span>
+    </button>
+  )
+}
+
+export function OptionalBlock({
+  enabled,
+  onToggle,
+  label,
+  description,
+  help,
+  children,
+}: {
+  enabled: boolean
+  onToggle: (value: boolean) => void
+  label: string
+  description?: string
+  help?: ReactNode
+  children: ReactNode
+}) {
+  const [showHelp, setShowHelp] = useState(false)
+  return (
+    <div className="rounded-2xl border border-line p-4">
+      <div className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <Switch checked={enabled} onChange={onToggle} label={label} description={description} />
+        </div>
+        {help ? (
+          <button
+            type="button"
+            onClick={() => setShowHelp((open) => !open)}
+            className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border border-primary text-[11px] font-semibold text-primary"
+            aria-label={`O que significa ${label}?`}
+          >
+            ?
+          </button>
+        ) : null}
+      </div>
+      {showHelp && help ? (
+        <p className="mt-3 rounded-xl bg-primary-soft px-3 py-2 text-xs leading-relaxed text-ink">
+          {help}
+        </p>
+      ) : null}
+      {enabled ? <div className="mt-4 space-y-4">{children}</div> : null}
+    </div>
   )
 }
 

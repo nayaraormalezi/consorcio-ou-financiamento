@@ -268,7 +268,9 @@ function errorsForStep(current: number, input: SimulatorInput): string[] {
   }
   if (current === 2) {
     const errors: string[] = []
-    if (input.consortiumBid < 0) errors.push('O lance não pode ser negativo.')
+    if (input.consortiumHasBid && input.consortiumBid < 0) {
+      errors.push('O lance não pode ser negativo.')
+    }
     if (input.contemplationMonth < 1 || input.contemplationMonth > input.termMonths) {
       errors.push('O mês de contemplação deve estar dentro do prazo.')
     }
@@ -282,7 +284,10 @@ function errorsForStep(current: number, input: SimulatorInput): string[] {
     if (input.rateMonthlyPct < 0 || input.rateAnnualPct < 0) {
       errors.push('As taxas de juros não podem ser negativas.')
     }
-    if (input.residualValue > input.creditValue - input.downPayment) {
+    if (
+      input.financingHasResidual &&
+      input.residualValue > input.creditValue - input.downPayment
+    ) {
       errors.push('O valor residual não pode exceder o valor financiado.')
     }
     return errors

@@ -25,25 +25,53 @@ export function validateInput(input: SimulatorInput): string[] {
   return errors
 }
 
+export function applyOptionalFields(input: SimulatorInput): SimulatorInput {
+  return {
+    ...input,
+    consortiumBid: input.consortiumHasBid ? input.consortiumBid : 0,
+    consortiumInsuranceMode: input.consortiumHasInsurance
+      ? input.consortiumInsuranceMode
+      : 'none',
+    consortiumMembershipFee: input.consortiumHasMembershipFee
+      ? input.consortiumMembershipFee
+      : 0,
+    consortiumOtherMonthly: input.consortiumHasOtherMonthly
+      ? input.consortiumOtherMonthly
+      : 0,
+    financingInsuranceMonthly: input.financingHasInsurance
+      ? input.financingInsuranceMonthly
+      : 0,
+    originationFee: input.financingHasOtherCosts ? input.originationFee : 0,
+    appraisalFee: input.financingHasOtherCosts ? input.appraisalFee : 0,
+    registryFee: input.financingHasOtherCosts ? input.registryFee : 0,
+    otherUpfront: input.financingHasOtherCosts ? input.otherUpfront : 0,
+    financingOtherMonthly: input.financingHasOtherCosts
+      ? input.financingOtherMonthly
+      : 0,
+    residualValue: input.financingHasResidual ? input.residualValue : 0,
+  }
+}
+
 export function simulate(input: SimulatorInput): ComparisonResult {
-  const errors = validateInput(input)
-  const extrasIncludedInCet = input.useCet && input.cetIncludesExtras
-  const rate = input.useCet
+  const effective = applyOptionalFields(input)
+  const errors = validateInput(effective)
+  const extrasIncludedInCet = effective.useCet && effective.cetIncludesExtras
+  const rate = effective.useCet
     ? resolveMonthlyRate({
-        monthlyPct: input.cetMonthlyPct,
-        annualPct: input.cetAnnualPct,
-        inputMode: input.cetInputMode,
-        annualKind: input.annualRateKind,
+        monthlyPct: effective.cetMonthlyPct,
+        annualPct: effective.cetAnnualPct,
+        inputMode: effective.cetInputMode,
+        annualKind: effective.annualRateKind,
       })
     : resolveMonthlyRate({
-        monthlyPct: input.rateMonthlyPct,
-        annualPct: input.rateAnnualPct,
-        inputMode: input.rateInputMode,
-        annualKind: input.annualRateKind,
+        monthlyPct: effective.rateMonthlyPct,
+        annualPct: effective.rateAnnualPct,
+        inputMode: effective.rateInputMode,
+        annualKind: effective.annualRateKind,
       })
 
-  const consortium = simulateConsortium(input)
-  const financing = simulateFinancing(input, rate.monthly, extrasIncludedInCet)
+  const consortium = simulateConsortium(effective)
+  const financing = simulateFinancing(effective, rate.monthly, extrasIncludedInCet)
 
   const nominalDiff = financing.totalDisbursed - consortium.totalDisbursed
   const npvDiff = financing.npv - consortium.npv

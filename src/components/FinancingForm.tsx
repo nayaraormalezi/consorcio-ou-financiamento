@@ -8,7 +8,7 @@ import type {
   SimulatorInput,
 } from '../calc/types'
 import { CurrencyInput, PercentInput } from './inputs'
-import { Card, Field, Hint, Segmented, SectionTitle } from './ui'
+import { Card, Field, Hint, OptionalBlock, Segmented, SectionTitle } from './ui'
 
 export function FinancingForm({
   input,
@@ -29,13 +29,14 @@ export function FinancingForm({
       <SectionTitle
         step="Etapa 3 · Financiamento"
         title="Condições do financiamento"
-        subtitle="Cálculo com amortização SAC ou Price. A taxa efetiva mensal é a usada nas fórmulas."
+        subtitle="Entrada, juros e sistema de amortização já bastam para comparar. Seguro e tarifas só aparecem se você ligar."
       />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field
           label="Entrada"
-          hint={`Equivalente a ${formatBRL(input.downPayment)}. É desembolso inicial, não um custo extra do bem.`}
+          hint={`Equivale a ${formatBRL(input.downPayment)}. É parte do preço, paga no início.`}
+          help="A entrada reduz o que você financia. Não é um custo extra do bem: é o pedaço que você paga à vista. O total desembolsado mostra a entrada separada das parcelas."
         >
           <div className="grid grid-cols-2 gap-2">
             <CurrencyInput
@@ -52,7 +53,10 @@ export function FinancingForm({
             />
           </div>
         </Field>
-        <Field label="Sistema de amortização">
+        <Field
+          label="Sistema de amortização"
+          help="SAC: você amortiza o mesmo valor todo mês; os juros caem e a parcela diminui com o tempo. Price: a parcela de juros + amortização fica estável. SAC costuma ter primeira parcela maior e menos juros no total."
+        >
           <Segmented<AmortizationSystem>
             value={input.amortization}
             onChange={(amortization) => onChange({ amortization })}
@@ -61,17 +65,14 @@ export function FinancingForm({
               { value: 'price', label: 'Price' },
             ]}
           />
-          <p className="mt-2 text-xs text-muted">
-            SAC: amortização constante e parcela decrescente. Price: parcela de
-            amortização + juros constante (antes de seguros).
-          </p>
         </Field>
       </div>
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         <Field
           label="Taxa de juros"
-          hint={`Cálculo usa ${formatRateMonthly(input.rateMonthlyPct)} efetiva · equivalente ${annualLabel}.`}
+          hint={`Usamos ${formatRateMonthly(input.rateMonthlyPct)} efetiva · equivalente ${annualLabel}.`}
+          help="É o preço do dinheiro emprestado. Informe a taxa do contrato, de preferência a efetiva. Se você só tiver a anual, mude para % a.a. O simulador converte e calcula sempre com a taxa efetiva mensal."
         >
           <Segmented<RateInputMode>
             value={input.rateInputMode}
@@ -107,7 +108,7 @@ export function FinancingForm({
         </Field>
         <Field
           label="Tipo da taxa anual"
-          hint="Nominal = 12 × mensal. Efetiva = (1 + mensal)¹² − 1. Sempre calculamos com a efetiva mensal."
+          help="Nominal é a taxa mensal multiplicada por 12. Efetiva considera o juro sobre juro do ano: (1 + mensal)¹² − 1. Se o banco disser “12% a.a. nominal”, escolha nominal. Se disser “taxa efetiva”, escolha efetiva."
         >
           <Segmented<AnnualRateKind>
             value={input.annualRateKind}
@@ -120,24 +121,28 @@ export function FinancingForm({
         </Field>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-line p-4">
-        <label className="flex items-start gap-3">
-          <input
-            type="checkbox"
-            className="mt-1"
-            checked={input.useCet}
-            onChange={(event) => onChange({ useCet: event.target.checked })}
+      <div className="mt-6">
+        <Field
+          label="Taxa de desconto para valor presente"
+          hint="Só entra na comparação do “dinheiro no tempo”, não muda o total nominal."
+          help="Serve para responder: o que vale mais, pagar agora ou daqui a vários anos? É o rendimento que você deixaria de ganhar se o dinheiro ficasse aplicado. Não altera o total pago, só o valor presente."
+        >
+          <PercentInput
+            value={input.discountAnnualPct}
+            onChange={(discountAnnualPct) => onChange({ discountAnnualPct })}
           />
-          <span>
-            <span className="block text-sm font-medium">Usar CET no lugar da taxa de juros</span>
-            <span className="text-xs text-muted">
-              O CET já embute juros, tarifas e parte dos seguros. Se marcado, o
-              simulador usa o CET como taxa e evita somar de novo os custos inclusos.
-            </span>
-          </span>
-        </label>
-        {input.useCet ? (
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        </Field>
+      </div>
+
+      <div className="mt-6 space-y-4">
+        <OptionalBlock
+          enabled={input.useCet}
+          onToggle={(useCet) => onChange({ useCet })}
+          label="Quero usar o CET"
+          description="Use se o banco informou o Custo Efetivo Total."
+          help="O CET junta juros, tarifas e parte dos seguros numa taxa só. Se você preencher o CET, o simulador usa essa taxa e pode deixar de somar de novo os custos que já estão dentro dele."
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label="CET mensal">
               <PercentInput
                 value={input.cetMonthlyPct}
@@ -154,89 +159,98 @@ export function FinancingForm({
                 }
               />
             </Field>
-            <label className="flex items-start gap-3 sm:col-span-2">
-              <input
-                type="checkbox"
-                className="mt-1"
-                checked={input.cetIncludesExtras}
-                onChange={(event) =>
-                  onChange({ cetIncludesExtras: event.target.checked })
-                }
-              />
-              <span className="text-sm text-muted">
-                O CET informado já inclui seguros, tarifa de cadastro, avaliação e
-                demais taxas desta seção.
-              </span>
-            </label>
           </div>
-        ) : null}
+          <label className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              className="mt-1"
+              checked={input.cetIncludesExtras}
+              onChange={(event) => onChange({ cetIncludesExtras: event.target.checked })}
+            />
+            <span className="text-sm text-muted">
+              Este CET já inclui seguros e tarifas. Não some esses custos outra vez.
+            </span>
+          </label>
+        </OptionalBlock>
+
+        <OptionalBlock
+          enabled={input.financingHasInsurance}
+          onToggle={(financingHasInsurance) => onChange({ financingHasInsurance })}
+          label="Tem seguro mensal"
+          description="Prestamista, MIP, DFI ou outro seguro cobrado todo mês."
+          help="Bancos costumam incluir seguro na parcela. Se a simulação do banco já veio “limpa”, sem seguro, deixe desligado. Se o CET já inclui seguro, ligue o CET e marque que ele já cobre esses custos."
+        >
+          <Field label="Seguro por mês">
+            <CurrencyInput
+              value={input.financingInsuranceMonthly}
+              onChange={(financingInsuranceMonthly) =>
+                onChange({ financingInsuranceMonthly })
+              }
+            />
+          </Field>
+        </OptionalBlock>
+
+        <OptionalBlock
+          enabled={input.financingHasOtherCosts}
+          onToggle={(financingHasOtherCosts) => onChange({ financingHasOtherCosts })}
+          label="Tem outras taxas e custos"
+          description="Cadastro, avaliação, registro, IOF e extras mensais."
+          help="São custos além dos juros: tarifa de cadastro, avaliação do bem, cartório, IOF e qualquer outro valor que o banco cobre. Preencha só o que aparecer na proposta. Se o CET já inclui isso, não preencha aqui."
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Tarifa de cadastro" help="Cobrança única na contratação, se houver.">
+              <CurrencyInput
+                value={input.originationFee}
+                onChange={(originationFee) => onChange({ originationFee })}
+              />
+            </Field>
+            <Field label="Taxa de avaliação" help="Custo para o banco avaliar o imóvel ou o bem.">
+              <CurrencyInput
+                value={input.appraisalFee}
+                onChange={(appraisalFee) => onChange({ appraisalFee })}
+              />
+            </Field>
+            <Field label="Registro / documentação" help="Cartório, ITBI estimado ou despachante, se você quiser incluir.">
+              <CurrencyInput
+                value={input.registryFee}
+                onChange={(registryFee) => onChange({ registryFee })}
+              />
+            </Field>
+            <Field label="IOF e outras taxas iniciais">
+              <CurrencyInput
+                value={input.otherUpfront}
+                onChange={(otherUpfront) => onChange({ otherUpfront })}
+              />
+            </Field>
+            <Field label="Outros custos mensais" help="Qualquer tarifa recorrente que não seja seguro nem juros.">
+              <CurrencyInput
+                value={input.financingOtherMonthly}
+                onChange={(financingOtherMonthly) => onChange({ financingOtherMonthly })}
+              />
+            </Field>
+          </div>
+        </OptionalBlock>
+
+        <OptionalBlock
+          enabled={input.financingHasResidual}
+          onToggle={(financingHasResidual) => onChange({ financingHasResidual })}
+          label="Tem valor residual"
+          description="Saldo pago no fim do contrato, comum em alguns veículos."
+          help="Alguns financiamentos deixam uma bola (balloon) para o último mês. Se o seu contrato quita tudo ao longo do prazo, deixe desligado."
+        >
+          <Field label="Valor residual">
+            <CurrencyInput
+              value={input.residualValue}
+              onChange={(residualValue) => onChange({ residualValue })}
+            />
+          </Field>
+        </OptionalBlock>
       </div>
 
-      <h3 className="mt-8 mb-3 text-sm font-semibold tracking-wide text-muted uppercase">
-        Seguros e demais custos
-      </h3>
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Seguro mensal">
-          <CurrencyInput
-            value={input.financingInsuranceMonthly}
-            onChange={(financingInsuranceMonthly) =>
-              onChange({ financingInsuranceMonthly })
-            }
-          />
-        </Field>
-        <Field label="Outros custos mensais">
-          <CurrencyInput
-            value={input.financingOtherMonthly}
-            onChange={(financingOtherMonthly) => onChange({ financingOtherMonthly })}
-          />
-        </Field>
-        <Field label="Tarifa de cadastro">
-          <CurrencyInput
-            value={input.originationFee}
-            onChange={(originationFee) => onChange({ originationFee })}
-          />
-        </Field>
-        <Field label="Taxa de avaliação">
-          <CurrencyInput
-            value={input.appraisalFee}
-            onChange={(appraisalFee) => onChange({ appraisalFee })}
-          />
-        </Field>
-        <Field label="Registro / documentação">
-          <CurrencyInput
-            value={input.registryFee}
-            onChange={(registryFee) => onChange({ registryFee })}
-          />
-        </Field>
-        <Field label="IOF e outras taxas iniciais">
-          <CurrencyInput
-            value={input.otherUpfront}
-            onChange={(otherUpfront) => onChange({ otherUpfront })}
-          />
-        </Field>
-        <Field
-          label="Valor residual / balloon (opcional)"
-          hint="Saldo pago no último mês. Comum em alguns contratos de veículos. 0 = quitação total no prazo."
-        >
-          <CurrencyInput
-            value={input.residualValue}
-            onChange={(residualValue) => onChange({ residualValue })}
-          />
-        </Field>
-        <Field
-          label="Taxa de desconto para valor presente"
-          hint="Custo de oportunidade anual efetivo. Usada só no VP, não altera o total nominal."
-        >
-          <PercentInput
-            value={input.discountAnnualPct}
-            onChange={(discountAnnualPct) => onChange({ discountAnnualPct })}
-          />
-        </Field>
-      </div>
       {input.useCet && input.cetIncludesExtras ? (
         <div className="mt-4">
           <Hint>
-            CET ativo: seguros e tarifas desta seção não entram de novo no fluxo,
+            CET ativo: seguros e tarifas desta tela não entram de novo no fluxo,
             para não duplicar o que já está no CET.
           </Hint>
         </div>

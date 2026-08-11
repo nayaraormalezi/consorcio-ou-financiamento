@@ -6,6 +6,7 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
   it('fecha juros do SAC e não duplica entrada nem lance', () => {
     const input = createDefaultInput()
     input.consortiumAnnualAdjustmentPct = 0
+    input.consortiumHasBid = true
     const result = simulate(input)
     const expectedInterest = ((0.01 * 240_000) / 2) * 121
 
@@ -26,5 +27,19 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
     )
     expect(result.consortium.totalDisbursed).toBeCloseTo(366_000, 2)
     expect(result.cheaperNominal).toBe('consortium')
+  })
+
+  it('ignora lance, seguro e taxas extras quando os interruptores estão desligados', () => {
+    const input = createDefaultInput()
+    input.consortiumHasBid = false
+    input.consortiumBid = 60_000
+    input.consortiumAnnualAdjustmentPct = 0
+    input.consortiumHasInsurance = false
+    input.consortiumHasMembershipFee = false
+    input.consortiumHasOtherMonthly = false
+
+    const result = simulate(input)
+    expect(result.consortium.bid).toBe(0)
+    expect(result.consortium.totalDisbursed).toBeCloseTo(366_000, 2)
   })
 })

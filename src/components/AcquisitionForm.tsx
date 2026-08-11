@@ -19,19 +19,24 @@ export function AcquisitionForm({
       <SectionTitle
         step="Etapa 1"
         title="Quanto você precisa?"
-        subtitle="Este valor é a referência das duas modalidades: o bem ou crédito que você quer comparar."
+        subtitle="Informe o valor do bem e em quanto tempo pretende pagar. Os números desta tela são um ponto de partida — você pode mudar tudo."
       />
       <div className="grid gap-5 sm:grid-cols-2">
         <Field
           label="Valor desejado"
-          hint="Valor do crédito/bem usado na comparação."
+          hint="Use o preço do bem ou o crédito que você busca."
+          help="É o valor de referência da comparação. Nas duas modalidades usamos o mesmo número para a comparação ser justa: o carro, o imóvel ou o crédito que você quer adquirir."
         >
           <CurrencyInput
             value={input.creditValue}
             onChange={(creditValue) => onChange({ creditValue })}
           />
         </Field>
-        <Field label="Prazo" hint={formatCompactMonths(input.termMonths)}>
+        <Field
+          label="Prazo"
+          hint={formatCompactMonths(input.termMonths)}
+          help="Quantos meses o contrato duraria. No consórcio é o prazo do grupo. No financiamento é o tempo para quitar o empréstimo. Prazos maiores diminuem a parcela e aumentam o total pago."
+        >
           <IntegerInput
             value={input.termMonths}
             onChange={(termMonths) => onChange({ termMonths })}
@@ -64,7 +69,8 @@ export function AcquisitionForm({
       <div className="mt-6">
         <Field
           label="Quando espera utilizar o crédito?"
-          hint="Indicador qualitativo. Não altera o cálculo financeiro — use o mês de contemplação no consórcio para o fluxo de caixa."
+          hint="Isso ajuda a interpretar o resultado. O mês exato da contemplação você informa na etapa do consórcio, se quiser."
+          help="No financiamento, se houver aprovação, o bem costuma ficar disponível no início. No consórcio, você só usa o crédito quando for contemplado por sorteio ou lance. Esta pergunta não inventa uma data — só deixa claro se a espera importa para você."
         >
           <Segmented<CreditTiming>
             value={input.creditTiming}
