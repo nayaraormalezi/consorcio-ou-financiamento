@@ -11,6 +11,7 @@ import { Premises } from './components/Premises'
 import { ResultsPanel } from './components/ResultsPanel'
 import { ScenariosBar } from './components/ScenariosBar'
 import { Schedule } from './components/Schedule'
+import { DownloadPdfButton } from './components/DownloadPdfButton'
 import { StepActions } from './components/ui'
 
 const ChartsPanel = lazy(async () => {
@@ -105,14 +106,18 @@ export default function App() {
       {step === 4 ? (
         <div className="sticky top-0 z-20 border-b border-line bg-ink text-white sm:hidden">
           <div className="grid grid-cols-2 gap-px bg-white/10 text-xs">
-            <div className="px-3 py-2">
-              <p className="text-inverse-muted">Consórcio</p>
-              <p className="font-medium">{formatBRL(result.consortium.totalDisbursed)}</p>
-            </div>
-            <div className="px-3 py-2">
-              <p className="text-inverse-muted">Financiamento</p>
-              <p className="font-medium">{formatBRL(result.financing.totalDisbursed)}</p>
-            </div>
+          <div className="px-3 py-2">
+            <p className="text-inverse-muted">Consórcio · total / VP</p>
+            <p className="font-medium">
+              {formatBRL(result.consortium.totalDisbursed)} · {formatBRL(result.consortium.npv)}
+            </p>
+          </div>
+          <div className="px-3 py-2">
+            <p className="text-inverse-muted">Financiamento · total / VP</p>
+            <p className="font-medium">
+              {formatBRL(result.financing.totalDisbursed)} · {formatBRL(result.financing.npv)}
+            </p>
+          </div>
           </div>
         </div>
       ) : null}
@@ -182,13 +187,16 @@ export default function App() {
           <>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-muted">Dados preenchidos. Você pode voltar e ajustar qualquer etapa.</p>
-              <button
-                type="button"
-                onClick={() => goTo(3)}
-                className="rounded-full border border-line bg-white px-4 py-2 text-sm font-medium hover:border-primary"
-              >
-                Ajustar dados
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => goTo(3)}
+                  className="rounded-full border border-line bg-white px-4 py-2 text-sm font-medium hover:border-primary"
+                >
+                  Ajustar dados
+                </button>
+                <DownloadPdfButton input={input} result={result} />
+              </div>
             </div>
             <ScenariosBar
               input={input}

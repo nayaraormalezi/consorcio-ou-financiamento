@@ -124,8 +124,8 @@ export function FinancingForm({
       <div className="mt-6">
         <Field
           label="Taxa de desconto para valor presente"
-          hint="Só entra na comparação do “dinheiro no tempo”, não muda o total nominal."
-          help="Serve para responder: o que vale mais, pagar agora ou daqui a vários anos? É o rendimento que você deixaria de ganhar se o dinheiro ficasse aplicado. Não altera o total pago, só o valor presente."
+          hint="Não muda o total desembolsado. Só a conta de “quanto isso vale hoje”."
+          help="O total desembolsado soma os reais do contrato. O valor presente pergunta o equivalente em dinheiro de hoje, porque R$ 1.000 daqui a 10 anos não pesam igual a R$ 1.000 agora. Esta taxa é o rendimento que você imagina que o dinheiro teria se ficasse aplicado. Quanto maior, mais as parcelas futuras “encolhem” nessa lente."
         >
           <PercentInput
             value={input.discountAnnualPct}

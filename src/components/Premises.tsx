@@ -49,7 +49,7 @@ export function Premises({
               depois a cada 12 meses.
               {input.consortiumAnnualAdjustmentPct === 0
                 ? ' Com 0%, não há correção — cenário hipotético, não o comportamento usual do contrato.'
-                : ` Nesta simulação o INPC foi aplicado ${cons.inpcApplications} ${cons.inpcApplications === 1 ? 'vez' : 'vezes'}: crédito e saldo remanescente são multiplicados por (1 + INPC) na data do aniversário.`}
+                : ` Nesta simulação o INPC foi aplicado ${cons.inpcApplications} ${cons.inpcApplications === 1 ? 'vez' : 'vezes'}: crédito e saldo remanescente sobem juntos. A carta vai de ${formatBRL(cons.creditValue)} para ${formatBRL(cons.finalCreditValue)}. Esse acréscimo no total pago não é juro: parte é correção do poder de compra.`}
             </li>
             <li>
               Não há juros de financiamento. O custo é taxa, fundo, seguro, adesão e correção pelo INPC.

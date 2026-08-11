@@ -73,6 +73,21 @@ export function simulate(input: SimulatorInput): ComparisonResult {
   const consortium = simulateConsortium(effective)
   const financing = simulateFinancing(effective, rate.monthly, extrasIncludedInCet)
 
+  const consortiumCostBeyondCredit =
+    consortium.adminFee +
+    consortium.reserveFund +
+    consortium.totalReajustmentExtra +
+    consortium.totalInsurance +
+    consortium.membershipFee +
+    consortium.totalOtherMonthly
+  const financingCostBeyondCredit =
+    financing.totalInterest +
+    financing.totalInsurance +
+    financing.totalUpfrontFees +
+    financing.totalMonthlyExtras
+  const cheaperNominal = cheaperOf(consortium.totalDisbursed, financing.totalDisbursed)
+  const cheaperNpv = cheaperOf(consortium.npv, financing.npv)
+  const cheaperCostBeyond = cheaperOf(consortiumCostBeyondCredit, financingCostBeyondCredit)
   const nominalDiff = financing.totalDisbursed - consortium.totalDisbursed
   const npvDiff = financing.npv - consortium.npv
   const baseNominal = Math.max(consortium.totalDisbursed, financing.totalDisbursed)
@@ -81,12 +96,17 @@ export function simulate(input: SimulatorInput): ComparisonResult {
   return {
     consortium,
     financing,
-    cheaperNominal: cheaperOf(consortium.totalDisbursed, financing.totalDisbursed),
-    cheaperNpv: cheaperOf(consortium.npv, financing.npv),
+    cheaperNominal,
+    cheaperNpv,
+    cheaperCostBeyond,
     nominalDiff,
     npvDiff,
     nominalDiffPct: baseNominal > 0 ? (Math.abs(nominalDiff) / baseNominal) * 100 : 0,
     npvDiffPct: baseNpv > 0 ? (Math.abs(npvDiff) / baseNpv) * 100 : 0,
+    consortiumCostBeyondCredit,
+    financingCostBeyondCredit,
+    creditPurchasingPowerGain: Math.max(0, consortium.finalCreditValue - consortium.creditValue),
+    metricsDisagree: cheaperNominal !== cheaperNpv,
     errors,
   }
 }

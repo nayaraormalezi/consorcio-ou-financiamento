@@ -144,9 +144,14 @@ export interface ComparisonResult {
   financing: FinancingResult
   cheaperNominal: CheaperOption
   cheaperNpv: CheaperOption
+  cheaperCostBeyond: CheaperOption
   nominalDiff: number
   npvDiff: number
   nominalDiffPct: number
   npvDiffPct: number
+  consortiumCostBeyondCredit: number
+  financingCostBeyondCredit: number
+  creditPurchasingPowerGain: number
+  metricsDisagree: boolean
   errors: string[]
 }

@@ -78,11 +78,13 @@ export function CostVsTime({
       </div>
 
       <div className="mt-5 overflow-x-auto">
-        <p className="mb-2 text-sm font-medium">Custo do dinheiro no tempo</p>
-        <p className="mb-3 text-xs text-muted">
-          O valor presente desconta os fluxos futuros à taxa anual efetiva de{' '}
-          {input.discountAnnualPct.toLocaleString('pt-BR')}% a.a. Assim, R$ 400 mil
-          em 2 anos não equivalem a R$ 400 mil em 15 anos.
+        <p className="mb-2 text-sm font-medium">Total desembolsado × valor presente</p>
+        <p className="mb-3 text-sm leading-relaxed text-muted">
+          <strong className="font-medium text-ink">Total desembolsado</strong> é a soma do que
+          sai da conta. <strong className="font-medium text-ink">Valor presente</strong> é essa
+          mesma soma, convertida para hoje com {input.discountAnnualPct.toLocaleString('pt-BR')}%
+          a.a.: pagar daqui a vários anos pesa menos do que pagar no começo. Os dois números
+          respondem perguntas diferentes; um não substitui o outro.
         </p>
         <table className="w-full min-w-[480px] text-left text-sm">
           <thead>
@@ -106,13 +108,11 @@ export function CostVsTime({
           </tbody>
         </table>
         <p className="mt-3 text-sm">
-          {result.cheaperNpv === 'tie'
-            ? 'No valor presente, as duas opções ficam muito próximas neste cenário.'
-            : result.cheaperNpv === 'consortium'
-              ? 'No valor presente, o consórcio também fica menor neste cenário.'
-              : result.cheaperNominal === 'consortium'
-                ? 'O consórcio paga menos no total nominal, mas o financiamento pode ficar mais competitivo em valor presente — ou o contrário, conforme a taxa de desconto e o momento dos desembolsos.'
-                : 'No valor presente, o financiamento fica menor neste cenário.'}
+          {result.metricsDisagree
+            ? 'Total nominal e valor presente apontam para lados diferentes neste cenário. O INPC empurra dinheiro do consórcio para o futuro; o financiamento prefixado concentra juros no começo.'
+            : result.cheaperNpv === 'tie'
+              ? 'No valor presente, as duas opções ficam muito próximas neste cenário.'
+              : `No valor presente, ${result.cheaperNpv === 'consortium' ? 'o consórcio' : 'o financiamento'} desembolsaria menos — a mesma leitura do total nominal neste cenário.`}
         </p>
       </div>
     </Card>

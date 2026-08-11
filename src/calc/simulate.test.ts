@@ -42,4 +42,14 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
     expect(result.consortium.bid).toBe(0)
     expect(result.consortium.totalDisbursed).toBeCloseTo(366_000, 2)
   })
+
+  it('separa custo além do crédito e detecta quando total e VP discordam', () => {
+    const result = simulate(createDefaultInput())
+    expect(result.consortiumCostBeyondCredit).toBeGreaterThan(result.consortium.adminFee)
+    expect(result.financingCostBeyondCredit).toBeCloseTo(result.financing.totalInterest, 2)
+    expect(result.creditPurchasingPowerGain).toBeGreaterThan(0)
+    expect(result.metricsDisagree).toBe(true)
+    expect(result.cheaperNominal).toBe('financing')
+    expect(result.cheaperNpv).toBe('consortium')
+  })
 })
