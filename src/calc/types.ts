@@ -1,0 +1,145 @@
+export type BidMode = 'reduce_installment' | 'reduce_term'
+export type BidKind = 'own' | 'embedded'
+export type InsuranceMode = 'none' | 'monthly' | 'percent'
+export type AmortizationSystem = 'sac' | 'price'
+export type RateInputMode = 'monthly' | 'annual'
+export type AnnualRateKind = 'effective' | 'nominal'
+export type CreditTiming = 'immediate' | '6m' | '1y' | 'flexible'
+export type MoneyPctField = 'money' | 'pct'
+
+export interface SimulatorInput {
+  creditValue: number
+  termMonths: number
+  creditTiming: CreditTiming
+
+  consortiumAdminFeePct: number
+  consortiumReservePct: number
+  consortiumInsuranceMode: InsuranceMode
+  consortiumInsuranceMonthly: number
+  consortiumInsurancePct: number
+  consortiumBid: number
+  consortiumBidPct: number
+  consortiumBidLastEdited: MoneyPctField
+  consortiumBidMode: BidMode
+  consortiumBidKind: BidKind
+  consortiumAnnualAdjustmentPct: number
+  consortiumFirstAnniversaryMonth: number
+  consortiumMembershipFee: number
+  consortiumOtherMonthly: number
+  contemplationMonth: number
+
+  downPayment: number
+  downPaymentPct: number
+  downPaymentLastEdited: MoneyPctField
+  rateMonthlyPct: number
+  rateAnnualPct: number
+  rateInputMode: RateInputMode
+  annualRateKind: AnnualRateKind
+  amortization: AmortizationSystem
+  financingInsuranceMonthly: number
+  originationFee: number
+  appraisalFee: number
+  registryFee: number
+  otherUpfront: number
+  financingOtherMonthly: number
+  residualValue: number
+  useCet: boolean
+  cetMonthlyPct: number
+  cetAnnualPct: number
+  cetInputMode: RateInputMode
+  cetIncludesExtras: boolean
+
+  discountAnnualPct: number
+}
+
+export interface CashFlowPoint {
+  month: number
+  amount: number
+}
+
+export interface ConsortiumMonth {
+  month: number
+  installment: number
+  insurance: number
+  other: number
+  bid: number
+  membershipFee: number
+  total: number
+  outstanding: number
+  creditValue: number
+  inpcApplied: boolean
+}
+
+export interface FinancingMonth {
+  month: number
+  openingBalance: number
+  amortization: number
+  interest: number
+  installment: number
+  insurance: number
+  other: number
+  residual: number
+  total: number
+  closingBalance: number
+}
+
+export interface ConsortiumResult {
+  creditValue: number
+  adminFee: number
+  reserveFund: number
+  bid: number
+  availableCredit: number
+  termMonths: number
+  paidMonths: number
+  firstInstallment: number
+  lastInstallment: number
+  totalInstallments: number
+  totalInsurance: number
+  totalOtherMonthly: number
+  membershipFee: number
+  totalReajustmentExtra: number
+  inpcApplications: number
+  finalCreditValue: number
+  totalDisbursed: number
+  npv: number
+  schedule: ConsortiumMonth[]
+  cashFlows: CashFlowPoint[]
+}
+
+export interface FinancingResult {
+  creditValue: number
+  downPayment: number
+  financedAmount: number
+  system: AmortizationSystem
+  monthlyRate: number
+  annualEffectiveRate: number
+  annualNominalRate: number
+  rateSource: 'cet' | 'interest'
+  firstInstallment: number
+  lastInstallment: number
+  totalInterest: number
+  totalAmortization: number
+  totalInsurance: number
+  totalMonthlyExtras: number
+  totalUpfrontFees: number
+  residual: number
+  totalDisbursed: number
+  npv: number
+  extrasIncludedInCet: boolean
+  schedule: FinancingMonth[]
+  cashFlows: CashFlowPoint[]
+}
+
+export type CheaperOption = 'consortium' | 'financing' | 'tie'
+
+export interface ComparisonResult {
+  consortium: ConsortiumResult
+  financing: FinancingResult
+  cheaperNominal: CheaperOption
+  cheaperNpv: CheaperOption
+  nominalDiff: number
+  npvDiff: number
+  nominalDiffPct: number
+  npvDiffPct: number
+  errors: string[]
+}

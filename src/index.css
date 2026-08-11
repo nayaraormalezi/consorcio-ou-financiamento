@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+/*
+  Tokens DSC (Figma: DSC | React Native - Tamagui)
+  https://www.figma.com/design/bUYeLeIlQ2CMLyUTy9CxOc
+  Node 9734:662
+
+  Fontes oficiais: CAIXA Std (títulos) e Roboto (corpo/números).
+  CAIXA Std é proprietária — se não estiver instalada, o fallback é Roboto.
+*/
+
+@theme {
+  --font-sans: Roboto, "CAIXA Std", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "CAIXA Std", Roboto, ui-sans-serif, system-ui, sans-serif;
+
+  --color-paper: #f0f2f2;
+  --color-ink: #22292e;
+  --color-muted: #525f66;
+  --color-line: #d0e0e3;
+  --color-card: #ffffff;
+  --color-surface: #f7fafa;
+
+  --color-primary: #005ca9;
+  --color-primary-hover: #00437a;
+  --color-primary-soft: #e5f2fc;
+
+  --color-cons: #005ca9;
+  --color-cons-soft: #e5f2fc;
+  --color-fin: #d87b00;
+  --color-fin-soft: #ffefd6;
+
+  --color-positive: #127527;
+  --color-positive-soft: #e7f4ea;
+  --color-attention: #977203;
+  --color-attention-soft: #ffefd6;
+  --color-negative: #b22c2c;
+  --color-negative-soft: #fbebeb;
+  --color-info: #038299;
+  --color-info-soft: #e5f5f8;
+  --color-disabled: #9eb2b8;
+  --color-inverse-muted: #9eb2b8;
+
+  --radius-md: 12px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+#root {
+  min-height: 100svh;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

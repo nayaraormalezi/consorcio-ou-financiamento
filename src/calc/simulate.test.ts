@@ -1,0 +1,30 @@
+import { describe, expect, it } from 'vitest'
+import { createDefaultInput } from './defaults'
+import { simulate } from './simulate'
+
+describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () => {
+  it('fecha juros do SAC e não duplica entrada nem lance', () => {
+    const input = createDefaultInput()
+    input.consortiumAnnualAdjustmentPct = 0
+    const result = simulate(input)
+    const expectedInterest = ((0.01 * 240_000) / 2) * 121
+
+    expect(result.errors).toHaveLength(0)
+    expect(result.financing.financedAmount).toBeCloseTo(240_000, 2)
+    expect(result.financing.totalInterest).toBeCloseTo(expectedInterest, 2)
+    expect(result.financing.totalDisbursed).toBeCloseTo(
+      60_000 + 240_000 + expectedInterest,
+      2,
+    )
+
+    expect(result.consortium.adminFee).toBeCloseTo(60_000, 2)
+    expect(result.consortium.reserveFund).toBeCloseTo(6_000, 2)
+    expect(result.consortium.bid).toBeCloseTo(60_000, 2)
+    expect(result.consortium.totalInstallments + result.consortium.bid).toBeCloseTo(
+      366_000,
+      2,
+    )
+    expect(result.consortium.totalDisbursed).toBeCloseTo(366_000, 2)
+    expect(result.cheaperNominal).toBe('consortium')
+  })
+})
