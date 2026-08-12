@@ -14,7 +14,7 @@ import {
 } from 'recharts'
 import { formatBRL } from '../calc/format'
 import type { ComparisonResult } from '../calc/types'
-import { Card } from './ui'
+import { Accordion } from './ui'
 
 const CONS = '#005ca9'
 const FIN = '#d87b00'
@@ -46,48 +46,150 @@ export function ChartsPanel({ result }: { result: ComparisonResult }) {
       juros: result.financing.totalInterest,
       seguro: result.financing.totalInsurance,
       taxas: result.financing.totalUpfrontFees + result.financing.totalMonthlyExtras,
-      outros: result.financing.residual,
     },
   ]
 
   return (
-    <div className="grid gap-5">
-      <Card>
-        <h3 className="font-display text-xl font-medium">Evolução das parcelas</h3>
-        <p className="mt-1 text-sm text-muted">
-          Consórcio e financiamento, mês a mês. Os prazos podem ser diferentes —
-          o financiamento segue o contrato bancário (padrão 360 meses). No SAC a
-          parcela de amortização + juros cai; seguros mensais entram no total.
+    <div className="space-y-10 sm:space-y-14">
+      <section aria-labelledby="parcelas-titulo">
+        <h3 id="parcelas-titulo" className="font-display text-xl font-semibold tracking-tight">
+          Como suas parcelas evoluem?
+        </h3>
+        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
+          Veja como o valor das parcelas pode se comportar ao longo do prazo. Os prazos podem
+          ser diferentes — o financiamento segue o contrato bancário.
         </p>
-        <div className="mt-4 h-72 w-full">
+        <div className="mt-5 h-72 w-full sm:h-80">
           <ResponsiveContainer>
-            <LineChart data={installmentData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid stroke={GRID} strokeDasharray="3 3" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} tickFormatter={axisMoney} width={72} />
-              <Tooltip formatter={(value) => formatBRL(Number(value))} />
-              <Legend />
-              <Line type="monotone" dataKey="consorcio" name="Consórcio" stroke={CONS} dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="financiamento" name="Financiamento" stroke={FIN} dot={false} strokeWidth={2} />
+            <LineChart data={installmentData} margin={{ top: 12, right: 12, left: 4, bottom: 4 }}>
+              <CartesianGrid stroke={GRID} strokeDasharray="3 3" vertical={false} />
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 12, fill: '#525f66' }}
+                axisLine={{ stroke: GRID }}
+                tickLine={false}
+                label={{ value: 'Mês', position: 'insideBottom', offset: -2, fontSize: 11, fill: '#525f66' }}
+              />
+              <YAxis
+                tick={{ fontSize: 12, fill: '#525f66' }}
+                tickFormatter={axisMoney}
+                width={72}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                formatter={(value, name) => [formatBRL(Number(value)), String(name)]}
+                labelFormatter={(month) => `Mês ${month}`}
+                contentStyle={{
+                  borderRadius: 12,
+                  border: '1px solid #d0e0e3',
+                  fontSize: 13,
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: 13, paddingTop: 8 }} />
+              <Line
+                type="monotone"
+                dataKey="consorcio"
+                name="Consórcio"
+                stroke={CONS}
+                dot={false}
+                strokeWidth={2.5}
+              />
+              <Line
+                type="monotone"
+                dataKey="financiamento"
+                name="Financiamento"
+                stroke={FIN}
+                dot={false}
+                strokeWidth={2.5}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </Card>
+      </section>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <Card>
-          <h3 className="font-display text-xl font-medium">Composição do valor total</h3>
-          <p className="mt-1 text-sm text-muted">
+      <section aria-labelledby="desembolso-titulo">
+        <h3 id="desembolso-titulo" className="font-display text-xl font-semibold tracking-tight">
+          Quanto você desembolsa ao longo do tempo?
+        </h3>
+        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
+          Soma do que já saiu do bolso, incluindo entrada ou lance.
+        </p>
+        <div className="mt-5 h-72 w-full sm:h-80">
+          <ResponsiveContainer>
+            <AreaChart data={cumulativeData} margin={{ top: 12, right: 12, left: 4, bottom: 4 }}>
+              <CartesianGrid stroke={GRID} strokeDasharray="3 3" vertical={false} />
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 12, fill: '#525f66' }}
+                axisLine={{ stroke: GRID }}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 12, fill: '#525f66' }}
+                tickFormatter={axisMoney}
+                width={72}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                formatter={(value, name) => [formatBRL(Number(value)), String(name)]}
+                labelFormatter={(month) => `Mês ${month}`}
+                contentStyle={{
+                  borderRadius: 12,
+                  border: '1px solid #d0e0e3',
+                  fontSize: 13,
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: 13, paddingTop: 8 }} />
+              <Area
+                type="monotone"
+                dataKey="consorcio"
+                name="Consórcio"
+                stroke={CONS}
+                fill={CONS}
+                fillOpacity={0.12}
+              />
+              <Area
+                type="monotone"
+                dataKey="financiamento"
+                name="Financiamento"
+                stroke={FIN}
+                fill={FIN}
+                fillOpacity={0.1}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        <Accordion
+          title="Análises detalhadas"
+          subtitle="Composição do valor total — crédito, juros, taxas, fundo e seguros."
+        >
+          <p className="mb-4 text-sm text-muted">
             O crédito/principal é o bem. O que muda o custo são juros, taxas, fundo e seguros.
           </p>
-          <div className="mt-4 h-72 w-full">
+          <div className="h-72 w-full">
             <ResponsiveContainer>
               <BarChart data={composition} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid stroke={GRID} strokeDasharray="3 3" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} tickFormatter={axisMoney} width={72} />
-                <Tooltip formatter={(value) => formatBRL(Number(value ?? 0))} />
-                <Legend />
+                <CartesianGrid stroke={GRID} strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#525f66' }} tickLine={false} />
+                <YAxis
+                  tick={{ fontSize: 12, fill: '#525f66' }}
+                  tickFormatter={axisMoney}
+                  width={72}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  formatter={(value, name) => [formatBRL(Number(value ?? 0)), String(name)]}
+                  contentStyle={{
+                    borderRadius: 12,
+                    border: '1px solid #d0e0e3',
+                    fontSize: 13,
+                  }}
+                />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Bar dataKey="credito" name="Crédito" stackId="a" fill={CONS} />
                 <Bar dataKey="taxas" name="Taxas / tarifas" stackId="a" fill={CONS_DARK} />
                 <Bar dataKey="fundo" name="Fundo de reserva" stackId="a" fill={CONS_LIGHT} />
@@ -98,28 +200,8 @@ export function ChartsPanel({ result }: { result: ComparisonResult }) {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </Card>
-
-        <Card>
-          <h3 className="font-display text-xl font-medium">Desembolso acumulado</h3>
-          <p className="mt-1 text-sm text-muted">
-            Quanto já saiu do bolso ao longo do tempo, incluindo entrada ou lance.
-          </p>
-          <div className="mt-4 h-72 w-full">
-            <ResponsiveContainer>
-              <AreaChart data={cumulativeData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid stroke={GRID} strokeDasharray="3 3" />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} tickFormatter={axisMoney} width={72} />
-                <Tooltip formatter={(value) => formatBRL(Number(value))} />
-                <Legend />
-                <Area type="monotone" dataKey="consorcio" name="Consórcio" stroke={CONS} fill={CONS} fillOpacity={0.15} />
-                <Area type="monotone" dataKey="financiamento" name="Financiamento" stroke={FIN} fill={FIN} fillOpacity={0.12} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-      </div>
+        </Accordion>
+      </section>
     </div>
   )
 }

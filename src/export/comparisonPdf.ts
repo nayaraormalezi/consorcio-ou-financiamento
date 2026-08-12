@@ -75,12 +75,16 @@ export function downloadComparisonPdf(input: SimulatorInput, result: ComparisonR
       ['Taxa de administração', formatBRL(cons.adminFee), '—'],
       ['Fundo de reserva', formatBRL(cons.reserveFund), '—'],
       ['Impacto do reajuste', formatBRL(cons.totalReajustmentExtra), '—'],
-      ['Encargos', formatBRL(result.consortiumCostBeyondCredit), formatBRL(result.financingCostBeyondCredit)],
       ['Seguros', formatBRL(cons.totalInsurance), formatBRL(fin.totalInsurance)],
       [
-        'Outras taxas',
+        'Tarifas e outros custos',
         formatBRL(cons.membershipFee + cons.totalOtherMonthly),
         formatBRL(fin.totalUpfrontFees + fin.totalMonthlyExtras),
+      ],
+      [
+        'Encargos (juros + seguros + tarifas)',
+        formatBRL(result.consortiumCostBeyondCredit),
+        formatBRL(result.financingCostBeyondCredit),
       ],
       ['Total desembolsado', formatBRL(cons.totalDisbursed), formatBRL(fin.totalDisbursed)],
       ['Valor presente dos pagamentos', formatBRL(cons.npv), formatBRL(fin.npv)],
@@ -104,7 +108,7 @@ export function downloadComparisonPdf(input: SimulatorInput, result: ComparisonR
       2: { cellWidth: 60 },
     },
     didParseCell: (data) => {
-      if (data.section === 'body' && data.row.index >= 16) {
+      if (data.section === 'body' && data.row.index >= 15) {
         data.cell.styles.fontStyle = 'bold'
       }
     },
@@ -164,7 +168,7 @@ export function downloadComparisonPdf(input: SimulatorInput, result: ComparisonR
   doc.setFontSize(8)
   doc.setTextColor(...MUTED)
   const notes = doc.splitTextToSize(
-    'Simulação matemática com as premissas informadas. O total nominal e o valor presente podem discordar: o INPC infla parcelas futuras do consórcio e também aumenta a carta de crédito; o financiamento prefixado não corrige o bem. Custo além do crédito isola taxa, fundo, INPC, juros e tarifas, sem misturar o preço do bem. Esta ferramenta não recomenda uma modalidade.',
+    'Simulação matemática com as premissas informadas. Encargos do financiamento = juros + seguros + tarifas; não incluem principal, entrada nem residual. O INPC infla parcelas futuras do consórcio e também aumenta a carta. Esta ferramenta não recomenda uma modalidade.',
     pageWidth - 28,
   )
   doc.text(notes, 14, notesY + 6)

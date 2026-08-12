@@ -1,76 +1,118 @@
 import { useMemo, useState } from 'react'
 import { formatBRL } from '../calc/format'
 import type { ComparisonResult } from '../calc/types'
-import { Card } from './ui'
 
 export function Schedule({ result }: { result: ComparisonResult }) {
   const [open, setOpen] = useState(false)
   const csv = useMemo(() => buildCsv(result), [result])
+  const previewMonths = 6
+  const rows = result.financing.schedule
+  const preview = rows.slice(0, previewMonths)
 
   return (
-    <Card>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="font-display text-xl font-medium">Cronograma mês a mês</h3>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            className="rounded-full border border-line px-3 py-1.5 text-sm"
-            onClick={() => setOpen((value) => !value)}
-          >
-            {open ? 'Ocultar tabela' : 'Ver tabela'}
-          </button>
-          <a
-            className="rounded-full bg-primary px-3 py-1.5 text-sm text-white hover:bg-primary-hover"
-            href={`data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`}
-            download="cronograma-consorcio-financiamento.csv"
-          >
-            Exportar CSV
-          </a>
+    <section aria-labelledby="cronograma-titulo">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 id="cronograma-titulo" className="font-display text-xl font-semibold tracking-tight">
+            Cronograma mês a mês
+          </h3>
+          <p className="mt-1 text-sm text-muted">
+            Veja como os pagamentos evoluem ao longo do período.
+          </p>
         </div>
+        <a
+          className="rounded-full bg-primary px-3 py-1.5 text-sm text-white hover:bg-primary-hover"
+          href={`data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`}
+          download="cronograma-consorcio-financiamento.csv"
+        >
+          Exportar CSV
+        </a>
       </div>
+
+      <div className="mt-4 overflow-x-auto">
+        <ScheduleTable
+          rows={preview}
+          consortium={result.consortium.schedule}
+          caption={`Primeiros ${previewMonths} meses`}
+        />
+      </div>
+
+      <div className="mt-3">
+        <button
+          type="button"
+          className="text-sm font-medium text-primary underline-offset-2 hover:underline"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+        >
+          {open ? 'Ocultar cronograma completo' : 'Ver cronograma completo'}
+        </button>
+      </div>
+
       {open ? (
         <div className="mt-4 max-h-[420px] overflow-auto">
-          <table className="w-full min-w-[900px] text-left text-xs">
-            <thead className="sticky top-0 bg-card">
-              <tr className="border-b border-line text-muted">
-                <th className="py-2 pr-2">Mês</th>
-                <th className="py-2 pr-2">INPC</th>
-                <th className="py-2 pr-2">Cons. parcela</th>
-                <th className="py-2 pr-2">Cons. lance</th>
-                <th className="py-2 pr-2">Cons. total</th>
-                <th className="py-2 pr-2">Fin. juros</th>
-                <th className="py-2 pr-2">Fin. amort.</th>
-                <th className="py-2 pr-2">Fin. parcela</th>
-                <th className="py-2">Fin. saldo</th>
-              </tr>
-            </thead>
-            <tbody>
-              {result.financing.schedule.map((fin) => {
-                const cons = result.consortium.schedule[fin.month - 1]
-                return (
-                  <tr key={fin.month} className="border-b border-line/70">
-                    <td className="py-1.5 pr-2">{fin.month}</td>
-                    <td className="py-1.5 pr-2">{cons?.inpcApplied ? 'Sim' : '—'}</td>
-                    <td className="py-1.5 pr-2">{formatBRL(cons?.installment ?? 0)}</td>
-                    <td className="py-1.5 pr-2">{formatBRL(cons?.bid ?? 0)}</td>
-                    <td className="py-1.5 pr-2">{formatBRL(cons?.total ?? 0)}</td>
-                    <td className="py-1.5 pr-2">{formatBRL(fin.interest)}</td>
-                    <td className="py-1.5 pr-2">{formatBRL(fin.amortization)}</td>
-                    <td className="py-1.5 pr-2">{formatBRL(fin.total)}</td>
-                    <td className="py-1.5">{formatBRL(fin.closingBalance)}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+          <ScheduleTable
+            rows={rows}
+            consortium={result.consortium.schedule}
+            caption="Cronograma completo"
+            sticky
+          />
         </div>
       ) : (
-        <p className="mt-3 text-sm text-muted">
-          A tabela completa pode ser longa. Use “Ver tabela” ou exporte o CSV para
-          auditar juros, amortização, lance e saldo.
+        <p className="mt-2 text-xs text-muted">
+          A tabela completa pode ser longa. Expanda ou exporte o CSV para auditar juros,
+          amortização, lance e saldo.
         </p>
       )}
-    </Card>
+    </section>
+  )
+}
+
+function ScheduleTable({
+  rows,
+  consortium,
+  caption,
+  sticky = false,
+}: {
+  rows: ComparisonResult['financing']['schedule']
+  consortium: ComparisonResult['consortium']['schedule']
+  caption: string
+  sticky?: boolean
+}) {
+  return (
+    <table className="w-full min-w-[900px] text-left text-xs">
+      <caption className="sr-only">{caption}</caption>
+      <thead className={sticky ? 'sticky top-0 bg-paper' : undefined}>
+        <tr className="border-b border-line text-muted">
+          <th className="py-2 pr-2 font-medium">Mês</th>
+          <th className="py-2 pr-2 font-medium">INPC</th>
+          <th className="py-2 pr-2 font-medium">Cons. parcela</th>
+          <th className="py-2 pr-2 font-medium">Cons. lance</th>
+          <th className="py-2 pr-2 font-medium">Cons. total</th>
+          <th className="py-2 pr-2 font-medium">Fin. juros</th>
+          <th className="py-2 pr-2 font-medium">Fin. amort.</th>
+          <th className="py-2 pr-2 font-medium">Fin. parcela</th>
+          <th className="py-2 font-medium">Fin. saldo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((fin) => {
+          const cons = consortium[fin.month - 1]
+          return (
+            <tr key={fin.month} className="border-b border-line/70">
+              <td className="py-1.5 pr-2">{fin.month}</td>
+              <td className="py-1.5 pr-2">{cons?.inpcApplied ? 'Sim' : '—'}</td>
+              <td className="py-1.5 pr-2">{formatBRL(cons?.installment ?? 0)}</td>
+              <td className="py-1.5 pr-2">{formatBRL(cons?.bid ?? 0)}</td>
+              <td className="py-1.5 pr-2">{formatBRL(cons?.total ?? 0)}</td>
+              <td className="py-1.5 pr-2">{formatBRL(fin.interest)}</td>
+              <td className="py-1.5 pr-2">{formatBRL(fin.amortization)}</td>
+              <td className="py-1.5 pr-2">{formatBRL(fin.total)}</td>
+              <td className="py-1.5">{formatBRL(fin.closingBalance)}</td>
+            </tr>
+          )
+        })}
+      </tbody>
+    </table>
   )
 }
 

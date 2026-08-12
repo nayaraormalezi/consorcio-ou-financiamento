@@ -79,4 +79,31 @@ describe('cenário de referência 300 mil / 120 meses / 20% / 1% a.m. SAC', () =
     const result = simulate(input)
     expect(result.errors.some((error) => error.includes('mês da contemplação'))).toBe(true)
   })
+
+  it('encargos do financiamento são só juros, seguros e tarifas', () => {
+    const input = createDefaultInput()
+    input.contemplationMonth = 1
+    input.financingTermMonths = 120
+    input.financingHasInsurance = true
+    input.financingInsuranceMonthly = 200
+    input.financingHasOtherCosts = true
+    input.originationFee = 3_000
+    input.financingOtherMonthly = 50
+    input.financingHasResidual = true
+    input.residualValue = 20_000
+
+    const result = simulate(input)
+    const fin = result.financing
+    const expected =
+      fin.totalInterest + fin.totalInsurance + fin.totalUpfrontFees + fin.totalMonthlyExtras
+
+    expect(result.financingCostBeyondCredit).toBeCloseTo(expected, 2)
+    expect(result.financingCostBeyondCredit).toBeCloseTo(
+      fin.totalInterest + fin.totalInsurance + 3_000 + 50 * 120,
+      2,
+    )
+    expect(result.financingCostBeyondCredit).not.toBeCloseTo(expected + fin.residual, 2)
+    expect(result.financingCostBeyondCredit).toBeLessThan(fin.totalDisbursed)
+    expect(fin.residual).toBeCloseTo(20_000, 2)
+  })
 })

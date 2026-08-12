@@ -14,21 +14,21 @@ export function ScenariosBar({
   saved: { name: string; result: ComparisonResult } | null
 }) {
   return (
-    <div className="rounded-2xl border border-line bg-card p-4 sm:p-5">
+    <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h3 className="font-display text-lg font-medium">Cenário personalizado</h3>
-          <p className="text-sm text-muted">Teste um “e se” sem perder o raciocínio da comparação.</p>
+          <h3 className="text-sm font-medium text-ink">Testar outro cenário</h3>
+          <p className="text-xs text-muted">Altere uma premissa sem refazer o preenchimento.</p>
         </div>
         <button
           type="button"
           onClick={onSave}
-          className="rounded-full bg-primary px-4 py-2 text-sm text-white hover:bg-primary-hover"
+          className="text-sm font-medium text-primary underline-offset-2 hover:underline"
         >
           Salvar cenário atual
         </button>
       </div>
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap gap-2">
         {WHAT_IF_SCENARIOS.map((scenario) => (
           <button
             key={scenario.id}

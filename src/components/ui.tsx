@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useId, useState, type ReactNode } from 'react'
 
 export function Card({
   children,
@@ -201,6 +201,45 @@ export function SectionTitle({
       <h2 className="font-display text-2xl font-semibold tracking-tight text-ink">{title}</h2>
       {subtitle ? <p className="mt-1 text-sm leading-relaxed text-muted">{subtitle}</p> : null}
     </header>
+  )
+}
+
+export function Accordion({
+  title,
+  subtitle,
+  children,
+  defaultOpen = false,
+}: {
+  title: string
+  subtitle?: string
+  children: ReactNode
+  defaultOpen?: boolean
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  const panelId = useId()
+  return (
+    <div className="border-t border-line">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((value) => !value)}
+        className="flex w-full items-center justify-between gap-4 py-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+      >
+        <span>
+          <span className="block text-sm font-medium text-ink">{title}</span>
+          {subtitle ? <span className="mt-0.5 block text-xs leading-relaxed text-muted">{subtitle}</span> : null}
+        </span>
+        <span className="shrink-0 text-lg leading-none text-muted" aria-hidden>
+          {open ? '−' : '+'}
+        </span>
+      </button>
+      {open ? (
+        <div id={panelId} className="pb-5">
+          {children}
+        </div>
+      ) : null}
+    </div>
   )
 }
 

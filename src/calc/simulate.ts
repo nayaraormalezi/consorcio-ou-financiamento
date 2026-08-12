@@ -86,11 +86,9 @@ export function simulate(input: SimulatorInput): ComparisonResult {
     consortium.totalInsurance +
     consortium.membershipFee +
     consortium.totalOtherMonthly
+  const financingTariffs = financing.totalUpfrontFees + financing.totalMonthlyExtras
   const financingCostBeyondCredit =
-    financing.totalInterest +
-    financing.totalInsurance +
-    financing.totalUpfrontFees +
-    financing.totalMonthlyExtras
+    financing.totalInterest + financing.totalInsurance + financingTariffs
   const cheaperNominal = cheaperOf(consortium.totalDisbursed, financing.totalDisbursed)
   const cheaperNpv = cheaperOf(consortium.npv, financing.npv)
   const cheaperCostBeyond = cheaperOf(consortiumCostBeyondCredit, financingCostBeyondCredit)

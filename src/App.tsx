@@ -107,29 +107,27 @@ export default function App() {
         <div className="sticky top-0 z-20 border-b border-line bg-ink text-white sm:hidden">
           <div className="grid grid-cols-2 gap-px bg-white/10 text-xs">
           <div className="px-3 py-2">
-            <p className="text-inverse-muted">Consórcio · total / VP</p>
-            <p className="font-medium">
-              {formatBRL(result.consortium.totalDisbursed)} · {formatBRL(result.consortium.npv)}
-            </p>
+            <p className="text-inverse-muted">Consórcio · total pago</p>
+            <p className="font-medium">{formatBRL(result.consortium.totalDisbursed)}</p>
           </div>
           <div className="px-3 py-2">
-            <p className="text-inverse-muted">Financiamento · total / VP</p>
-            <p className="font-medium">
-              {formatBRL(result.financing.totalDisbursed)} · {formatBRL(result.financing.npv)}
-            </p>
+            <p className="text-inverse-muted">Financiamento · total pago</p>
+            <p className="font-medium">{formatBRL(result.financing.totalDisbursed)}</p>
           </div>
           </div>
         </div>
       ) : null}
 
       <main className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-6 sm:px-6 sm:py-10">
-        <aside className="rounded-2xl border border-info/30 bg-info-soft px-4 py-3 text-sm leading-relaxed text-info">
-          Esta é uma simulação matemática. No consórcio, o crédito e as parcelas
-          são corrigidos pelo INPC no aniversário do grupo, com a taxa que você
-          informar. Condições reais podem variar. A ferramenta não recomenda
-          consórcio nem financiamento — ela responde quanto você desembolsaria
-          nestas premissas.
-        </aside>
+        {step < 4 ? (
+          <aside className="rounded-2xl border border-info/30 bg-info-soft px-4 py-3 text-sm leading-relaxed text-info">
+            Esta é uma simulação matemática. No consórcio, o crédito e as parcelas
+            são corrigidos pelo INPC no aniversário do grupo, com a taxa que você
+            informar. Condições reais podem variar. A ferramenta não recomenda
+            consórcio nem financiamento — ela responde quanto você desembolsaria
+            nestas premissas.
+          </aside>
+        ) : null}
 
         {stepErrors.length > 0 ? (
           <aside className="rounded-2xl border border-negative/30 bg-negative-soft px-4 py-3 text-sm text-negative">
@@ -184,9 +182,11 @@ export default function App() {
         ) : null}
 
         {step === 4 ? (
-          <>
+          <div className="flex flex-col gap-10 sm:gap-14">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-muted">Dados preenchidos. Você pode voltar e ajustar qualquer etapa.</p>
+              <p className="text-sm text-muted">
+                Premissas desta simulação. Você pode voltar e ajustar qualquer etapa.
+              </p>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
@@ -198,6 +198,15 @@ export default function App() {
                 <DownloadPdfButton input={input} result={result} />
               </div>
             </div>
+
+            <ResultsPanel result={result} input={input} />
+            <Suspense fallback={<p className="text-sm text-muted">Carregando gráficos…</p>}>
+              <ChartsPanel result={result} />
+            </Suspense>
+            <CostVsTime input={input} result={result} />
+            <Schedule result={result} />
+            <Premises input={input} result={result} />
+
             <ScenariosBar
               input={input}
               onChange={(next) => setInput(syncDerivedFields(next))}
@@ -212,8 +221,8 @@ export default function App() {
             />
 
             {saved ? (
-              <section className="rounded-2xl border border-line bg-card p-5">
-                <h3 className="font-display text-lg font-medium">Comparação com o cenário salvo</h3>
+              <section>
+                <h3 className="text-sm font-medium">Comparação com o cenário salvo</h3>
                 <div className="mt-3 overflow-x-auto">
                   <table className="w-full min-w-[520px] text-left text-sm">
                     <thead>
@@ -240,20 +249,26 @@ export default function App() {
               </section>
             ) : null}
 
-            <ResultsPanel result={result} input={input} />
-            <Suspense
-              fallback={
-                <div className="rounded-2xl border border-line bg-card p-5 text-sm text-muted">
-                  Carregando gráficos…
-                </div>
-              }
-            >
-              <ChartsPanel result={result} />
-            </Suspense>
-            <CostVsTime input={input} result={result} />
-            <Schedule result={result} />
-            <Premises input={input} result={result} />
-          </>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6">
+              <button
+                type="button"
+                onClick={() => goTo(1)}
+                className="rounded-full border border-line bg-white px-5 py-2.5 text-sm font-medium hover:border-ink"
+              >
+                Refazer simulação
+              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => goTo(3)}
+                  className="rounded-full border border-line bg-white px-4 py-2 text-sm font-medium hover:border-primary"
+                >
+                  Ajustar dados
+                </button>
+                <DownloadPdfButton input={input} result={result} />
+              </div>
+            </div>
+          </div>
         ) : null}
       </main>
 
