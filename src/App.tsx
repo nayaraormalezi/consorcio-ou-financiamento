@@ -12,7 +12,7 @@ import { ResultsPanel } from './components/ResultsPanel'
 import { ScenariosBar } from './components/ScenariosBar'
 import { Schedule } from './components/Schedule'
 import { DownloadPdfButton } from './components/DownloadPdfButton'
-import { StepActions } from './components/ui'
+import { Card, StepActions } from './components/ui'
 
 const ChartsPanel = lazy(async () => {
   const mod = await import('./components/ChartsPanel')
@@ -182,7 +182,7 @@ export default function App() {
         ) : null}
 
         {step === 4 ? (
-          <div className="flex flex-col gap-10 sm:gap-14">
+          <Card className="flex flex-col gap-10 sm:gap-14">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-muted">
                 Premissas desta simulação. Você pode voltar e ajustar qualquer etapa.
@@ -268,7 +268,7 @@ export default function App() {
                 <DownloadPdfButton input={input} result={result} />
               </div>
             </div>
-          </div>
+          </Card>
         ) : null}
       </main>
 

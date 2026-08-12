@@ -81,7 +81,7 @@ function ScheduleTable({
   return (
     <table className="w-full min-w-[900px] text-left text-xs">
       <caption className="sr-only">{caption}</caption>
-      <thead className={sticky ? 'sticky top-0 bg-paper' : undefined}>
+      <thead className={sticky ? 'sticky top-0 bg-card' : undefined}>
         <tr className="border-b border-line text-muted">
           <th className="py-2 pr-2 font-medium">Mês</th>
           <th className="py-2 pr-2 font-medium">INPC</th>

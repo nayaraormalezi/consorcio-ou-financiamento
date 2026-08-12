@@ -161,22 +161,38 @@ export function syncDerivedFields(input: SimulatorInput): SimulatorInput {
     next.cetMonthlyPct = cet.monthly * 100
   }
 
+  if (next.termMonths >= 1) {
+    next.termMonths = Math.min(420, Math.round(next.termMonths))
+  } else {
+    next.termMonths = 0
+  }
+  if (next.financingTermMonths >= 1) {
+    next.financingTermMonths = Math.min(420, Math.round(next.financingTermMonths))
+  } else {
+    next.financingTermMonths = 0
+  }
   if (next.contemplationMonth >= 1) {
-    next.contemplationMonth = Math.min(
-      Math.max(1, Math.round(next.contemplationMonth)),
-      Math.max(1, next.termMonths),
-    )
+    next.contemplationMonth = Math.max(1, Math.round(next.contemplationMonth))
+    if (next.termMonths >= 1) {
+      next.contemplationMonth = Math.min(next.contemplationMonth, next.termMonths)
+    }
   } else {
     next.contemplationMonth = 0
   }
-  next.consortiumFirstAnniversaryMonth = Math.min(
-    Math.max(1, Math.round(next.consortiumFirstAnniversaryMonth || 13)),
-    Math.max(1, next.termMonths + 12),
-  )
-  next.financingTermMonths = Math.min(
-    420,
-    Math.max(1, Math.round(next.financingTermMonths || next.termMonths)),
-  )
+  if (next.consortiumFirstAnniversaryMonth >= 1) {
+    next.consortiumFirstAnniversaryMonth = Math.max(
+      1,
+      Math.round(next.consortiumFirstAnniversaryMonth),
+    )
+    if (next.termMonths >= 1) {
+      next.consortiumFirstAnniversaryMonth = Math.min(
+        next.consortiumFirstAnniversaryMonth,
+        next.termMonths + 12,
+      )
+    }
+  } else {
+    next.consortiumFirstAnniversaryMonth = 0
+  }
 
   return next
 }

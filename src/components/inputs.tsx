@@ -77,7 +77,7 @@ export function IntegerInput({
   placeholder?: string
   required?: boolean
 }) {
-  const empty = allowEmpty && value < min
+  const empty = value < min
   return (
     <input
       inputMode="numeric"
@@ -87,14 +87,17 @@ export function IntegerInput({
       placeholder={placeholder}
       required={required}
       aria-required={required || undefined}
+      onFocus={(event) => event.target.select()}
       onChange={(event) => {
         const digits = event.target.value.replace(/\D/g, '')
-        if (!digits && allowEmpty) {
-          onChange(0)
+        if (!digits) {
+          onChange(allowEmpty ? 0 : min > 0 ? 0 : min)
           return
         }
-        const next = digits ? Number(digits) : min
-        onChange(Math.min(max, Math.max(min, next)))
+        onChange(Math.min(max, Number(digits)))
+      }}
+      onBlur={() => {
+        if (value < min && !allowEmpty) onChange(min)
       }}
     />
   )
