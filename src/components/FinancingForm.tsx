@@ -45,6 +45,31 @@ export function FinancingForm({
             min={1}
             max={420}
           />
+          <div className="mt-2">
+            <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">
+              Prazos usuais no crédito imobiliário
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {FINANCING_TERM_PRESETS.map((months) => (
+                <button
+                  key={months}
+                  type="button"
+                  onClick={() => onChange({ financingTermMonths: months })}
+                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                    input.financingTermMonths === months
+                      ? 'border-primary bg-primary text-white'
+                      : 'border-line bg-white text-ink hover:border-primary'
+                  }`}
+                >
+                  {months === 360
+                    ? '360 meses · padrão'
+                    : months === 420
+                      ? '420 meses · teto'
+                      : `${months} meses`}
+                </button>
+              ))}
+            </div>
+          </div>
         </Field>
         <Field
           label="Entrada"
@@ -79,31 +104,6 @@ export function FinancingForm({
             ]}
           />
         </Field>
-      </div>
-      <div className="mt-4">
-        <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">
-          Prazos usuais no crédito imobiliário
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {FINANCING_TERM_PRESETS.map((months) => (
-            <button
-              key={months}
-              type="button"
-              onClick={() => onChange({ financingTermMonths: months })}
-              className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                input.financingTermMonths === months
-                  ? 'border-primary bg-primary text-white'
-                  : 'border-line bg-white text-ink hover:border-primary'
-              }`}
-            >
-              {months === 360
-                ? '360 meses · padrão'
-                : months === 420
-                  ? '420 meses · teto'
-                  : `${months} meses`}
-            </button>
-          ))}
-        </div>
       </div>
 
       {!input.useCet ? (
